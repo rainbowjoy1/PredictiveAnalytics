@@ -9,6 +9,7 @@ library(tidyr)
 library(fable)
 library(AER)
 library(MASS)
+library(caret)
 
 
 ###Question 1
@@ -24,7 +25,6 @@ data("USMacroG", package = "AER")
 summary(USMacroG)
 USMacroG
 dpi <- USMacroG[,"dpi"]
-
 
 ####1. Create two plots, one for the disposable income series and one for its autocorrelation. What
 ####are the relevant features of the data? Can you confirm them from the autocorrelation function?
@@ -67,11 +67,47 @@ autoplot(growth_dpi) + labs(title="Box Cox Diff Data over time")
 ggAcf(growth_dpi, lag.max = 300)
 
 #The transformed data is no longer trending. Generally the data seems to be cyclical in
-#having upward trending periods followed by downward trending periods. 
+#having upward trending periods followed by downward trending periods, but it shows no seasonality
+
+Box.test(growth_dpi, type = c("Ljung-Box"), lag = 10)
+
+#we ran the Ljung-Box test to determine if the autocerrelations are significantly different
+#than white noise. We found that the p-value is very small so the residuals are
+#distinguisable from white noise and autocorrelation exsists.
 
 ####3. Split the sample into a training and a test set. Fit the level of disposable income with 2 models
 ####from the ETS class (hint: use one model ???guessed??? and one model automatically selected).
 ####Discuss the models and their residuals (include a test on residuals autocorrelation).
+
+dpi_train <- window(growth_dpi, end = 1990)
+dpi_test <- window(growth_dpi, start = 1991)
+
+
+#following code needs adjustments but it does work
+
+fit <- China_GDP %>%
+  model(ETS(GDP))
+report(fit)
+
+dpi_train %>%
+  stretch_tsibble(.init = 10) %>%
+  model(
+    SES = ETS(dpi ~ error("A") + trend("N") + season("N")),
+    Holt = ETS(dpi ~ error("A") + trend("A") + season("N")),
+    Damped = ETS(dpi ~ error("A") + trend("Ad") +
+                   season("N"))
+  ) %>%
+  forecast(h = 20) %>%
+  accuracy(dpi_train)
+
+
+#Broken ass code
+
+#gathered <- gather(BC_dpi)
+
+#long_DF <- BC_dpi %>% gather(key=Quarter, value=value -dpi)
+
+#df_pivoted <- pivot_longer(!dpi, names_to = "Quarter")
 
 
 ####4. Now forecast the test set, plot the two forecasts with the original data into two separate
