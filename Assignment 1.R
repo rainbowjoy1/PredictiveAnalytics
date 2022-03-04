@@ -1,7 +1,9 @@
 #Assignment 1
+install.packages("ggfortify") 
 
 #Currently not all packages are being used. Uploaded for ease later
 library(ggplot2)
+library(ggfortify)
 library(fpp3)
 library(tidyr)
 library(fable)
@@ -51,3 +53,4 @@ ggAcf(USMacroG[,"dpi"]) + labs(y= "Autocorrelation", title= "Autocorrelation of 
 ####5. Pick the real consumption expenditures and transform the series to create a series for the
 ####growth rate quarter on quarter. Plot the growth rate of real consumption expenditures against 
 ####the growth rate of disposable income. Do you think there is any relation?
+
