@@ -1,9 +1,5 @@
-#Asignment 1
-#This is Danielle's change again
+#Assignment 1
 
-#this is so not up to date
-
-#one more comment
 
 #Currently not all packages are being used. Uploaded for ease later
 library(ggplot2)
