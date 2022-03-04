@@ -13,6 +13,7 @@ summary(USMacroG)
 USMacroG
 
 #Annaya is here
+#we are looking
 ###Question 1
 #For this question, we will study real disposable income (disposable income from now on) and
 #real consumption expenditure (consumption expenditure from now on) in US from 1950 to 2000.
