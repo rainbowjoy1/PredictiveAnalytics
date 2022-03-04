@@ -1,6 +1,5 @@
 #Assignment 1
 
-
 #Currently not all packages are being used. Uploaded for ease later
 library(ggplot2)
 library(fpp3)
@@ -8,13 +7,6 @@ library(tidyr)
 library(fable)
 library(AER)
 
-data("USMacroG", package = "AER")
-summary(USMacroG)
-USMacroG
-
-#Annaya is here
-#we are looking
-#Anna is here too
 ###Question 1
 #For this question, we will study real disposable income (disposable income from now on) and
 #real consumption expenditure (consumption expenditure from now on) in US from 1950 to 2000.
@@ -24,9 +16,21 @@ USMacroG
 #month end 90 day treasury bill rate, Unemployment rate, Population (in million), Inflation rate, Ex
 #post real interest rate (computed as treasury bill rate - inflation). Data have quarterly frequency.
 
+data("USMacroG", package = "AER")
+summary(USMacroG)
+USMacroG
+
 ####1. Create two plots, one for the disposable income series and one for its autocorrelation. What
 ####are the relevant features of the data? Can you confirm them from the autocorrelation function?
 ####Would it make sense to transform the data? Why?
+
+autoplot(USMacroG[, "dpi"]) + labs(y= "DPI $USD", title= "Disposible US Income over Time")
+
+#The plot currently looks like it could be exponential. It is hard to tell if 
+#there is seasonality but if there is it is not strong. The graph is not smooth and has a 
+#clear upward trend.
+
+ggAcf(USMacroG[,"dpi"]) + labs(y= "Autocorrelation", title= "Autocorrelation of DPI in the US")
 
 
 ####2. Transform the series to create a series for the growth rate of disposable income in US quarter
