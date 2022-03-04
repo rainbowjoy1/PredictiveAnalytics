@@ -1,13 +1,14 @@
 #Assignment 1
-install.packages("ggfortify") 
 
 #Currently not all packages are being used. Uploaded for ease later
 library(ggplot2)
 library(ggfortify)
+library(forecast)
 library(fpp3)
 library(tidyr)
 library(fable)
 library(AER)
+
 
 ###Question 1
 #For this question, we will study real disposable income (disposable income from now on) and
@@ -30,9 +31,17 @@ autoplot(USMacroG[, "dpi"]) + labs(y= "DPI $USD", title= "Disposible US Income o
 
 #The plot currently looks like it could be exponential. It is hard to tell if 
 #there is seasonality but if there is it is not strong. The graph is not smooth and has a 
-#clear upward trend.
+#clear upward trend.The data is not random and we think has a strong correlation
 
-ggAcf(USMacroG[,"dpi"]) + labs(y= "Autocorrelation", title= "Autocorrelation of DPI in the US")
+ggAcf(USMacroG[,"dpi"], lag.max = 300) + labs(y= "Autocorrelation", title= "Autocorrelation of DPI in the US")
+
+#The correlation proves that there is strong correlation between dpi over time. It shows that the 
+#relationship is correlated, positive, and trending upward over time. It does not highlight 
+#seasonality and has a very smooth shape.
+
+#The data seems to be exponential based on the plot and and the autocorrelation so we
+#should remove it via finding the logs or via box-cox. This should be done so that we can run 
+#further exploration on linear data and get appropriate results.
 
 
 ####2. Transform the series to create a series for the growth rate of disposable income in US quarter
