@@ -8,6 +8,7 @@ library(fpp3)
 library(tidyr)
 library(fable)
 library(AER)
+library(MASS)
 
 
 ###Question 1
@@ -22,18 +23,20 @@ library(AER)
 data("USMacroG", package = "AER")
 summary(USMacroG)
 USMacroG
+dpi <- USMacroG[,"dpi"]
+
 
 ####1. Create two plots, one for the disposable income series and one for its autocorrelation. What
 ####are the relevant features of the data? Can you confirm them from the autocorrelation function?
 ####Would it make sense to transform the data? Why?
 
-autoplot(USMacroG[, "dpi"]) + labs(y= "DPI $USD", title= "Disposible US Income over Time")
+autoplot(dpi) + labs(y= "DPI $USD", title= "Disposible US Income over Time")
 
 #The plot currently looks like it could be exponential. It is hard to tell if 
 #there is seasonality but if there is it is not strong. The graph is not smooth and has a 
 #clear upward trend.The data is not random and we think has a strong correlation
 
-ggAcf(USMacroG[,"dpi"], lag.max = 300) + labs(y= "Autocorrelation", title= "Autocorrelation of DPI in the US")
+ggAcf(dpi, lag.max = 300) + labs(y= "Autocorrelation", title= "Autocorrelation of DPI in the US")
 
 #The correlation proves that there is strong correlation between dpi over time. It shows that the 
 #relationship is correlated, positive, and trending upward over time. It does not highlight 
@@ -45,10 +48,21 @@ ggAcf(USMacroG[,"dpi"], lag.max = 300) + labs(y= "Autocorrelation", title= "Auto
 
 
 ####2. Transform the series to create a series for the growth rate of disposable income in US quarter
-####on quarter. Plot the growth series and its autocorrelation function and comment it. Are the
-####data still trending? Do you see any sign of seasonality or cycle? Perform a statistical test to
-####verify whether data are autocorrelated or not.
+####on quarter. Plot the growth series and its autocorrelation function and comment it. Is the
+####data still trending? Do you see any sign of seasonality or cycles? Perform a statistical test to
+####verify whether data is autocorrelated or not.
 
+dpi_lambda <- BoxCox.lambda(USMacroG[,"dpi"])
+
+#because our lambda value is greater than 0.1 (.295) we will use the Box-Cox method to 
+#transform the data to a linear dataset
+
+
+BoxCox.lambda(dpi)
+BC_dpi = (BoxCox (dpi, dpi_lambda))
+autoplot(BoxCox(dpi, lambda=dpi_lambda))
+
+ggAcf(BC_dpi, lag.max = 300)
 
 ####3. Split the sample into a training and a test set. Fit the level of disposable income with 2 models
 ####from the ETS class (hint: use one model ???guessed??? and one model automatically selected).
