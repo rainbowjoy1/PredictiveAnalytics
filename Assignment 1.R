@@ -7,9 +7,9 @@ library(tidyr)
 library(fable)
 library(AER)
 
-data(???DatasetName???,package = ???AER???)
-
-US_Macro_df <- data("USMacroG")
+data("USMacroG", package = "AER")
+summary(USMacroG)
+USMacroG
 
 ###Question 1
 #For this question, we will study real disposable income (disposable income from now on) and
