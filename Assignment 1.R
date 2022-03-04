@@ -62,7 +62,12 @@ BoxCox.lambda(dpi)
 BC_dpi = (BoxCox (dpi, dpi_lambda))
 autoplot(BoxCox(dpi, lambda=dpi_lambda))
 
-ggAcf(BC_dpi, lag.max = 300)
+growth_dpi <- diff(BC_dpi)
+autoplot(growth_dpi) + labs(title="Box Cox Diff Data over time")
+ggAcf(growth_dpi, lag.max = 300)
+
+#The transformed data is no longer trending. Generally the data seems to be cyclical in
+#having upward trending periods followed by downward trending periods. 
 
 ####3. Split the sample into a training and a test set. Fit the level of disposable income with 2 models
 ####from the ETS class (hint: use one model ???guessed??? and one model automatically selected).
