@@ -129,3 +129,29 @@ growth.USIncTest <- window(gdpil, start = 1950 Q1)
 ####growth rate quarter on quarter. Plot the growth rate of real consumption expenditures against 
 ####the growth rate of disposable income. Do you think there is any relation?
 
+
+cpi <- USMacroG[,"cpi"]
+
+cpi_1 <- as_tsibble(USMacroG[,"cpi"])
+
+autoplot(cpi) + labs(y= "CPI $USD", title= "Consumption Expenditures over Time")
+ggAcf(cpi, lag.max = 300) + labs(y= "Autocorrelation", title= "Autocorrelation of CPI in the US")
+cpi_lambda <- BoxCox.lambda(USMacroG[,"cpi"])
+
+BoxCox.lambda(cpi)
+BC_cpi = (BoxCox (cpi, cpi_lambda))
+autoplot(BoxCox(cpi, lambda=cpi_lambda))
+
+growth_cpi <- diff(BC_cpi)
+autoplot(growth_cpi) + labs(title="CPI Box Cox Diff Data over time")
+ggAcf(growth_cpi, lag.max = 300)
+
+
+gcpil<- as_tsibble(growth_cpi)
+
+cpi_dpi<- cbind(growth_cpi, growth_dpi)
+autoplot(cpi_dpi)
+
+#trying to make a single line that is the difference of the diffs to see if there is any relation
+
+cpi_dpi$V3 <- cpi_dpi - cpi_dpi$V2
