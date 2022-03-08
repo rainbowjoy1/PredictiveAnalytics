@@ -1,11 +1,6 @@
 #Assignment 1
 
-#library(ggfortify)
-
-#library(fpp3)
-#library(tidyr) 
 library(MASS) #for mutate()
-#library(caret)
 library(forecast) #for BoxCox()
 library(fable)
 library(tsibble)
@@ -170,5 +165,5 @@ gdpil<- as_tsibble(real_growth_rate_dpi)
 cpi_dpi <- inner_join(gcpil, gdpil, by = "index")
 
 ggplot(cpi_dpi, aes(index)) + 
-  geom_line(aes(y = Rate_percent.x, colour = "Rate_Percent.x")) + 
-  geom_line(aes(y = Rate_percent.y, colour = "Rate_percent.y"))
+  geom_line(aes(y = Rate_percent.x, colour = "CPI Growth Rate")) + 
+  geom_line(aes(y = Rate_percent.y, colour = "DPI Growth Rate"))
