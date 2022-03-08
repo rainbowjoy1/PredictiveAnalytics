@@ -26,9 +26,7 @@ data("USMacroG", package = "AER")
 summary(USMacroG)
 USMacroG
 dpi <- USMacroG[,"dpi"]
-dpi
 dpi_l <- as_tsibble(USMacroG[,"dpi"])
-dpi_l
 
 ####1. Create two plots, one for the disposable income series and one for its autocorrelation. What
 ####are the relevant features of the data? Can you confirm them from the autocorrelation function?
@@ -66,9 +64,16 @@ BoxCox.lambda(dpi)
 BC_dpi = (BoxCox (dpi, dpi_lambda))
 autoplot(BoxCox(dpi, lambda=dpi_lambda))
 
-growth_dpi <- diff(BC_dpi)
-autoplot(growth_dpi) + labs(title="Box Cox Diff Data over time")
-ggAcf(growth_dpi, lag.max = 24)
+x <- as_tsibble(BC_dpi)
+x$observation <- 1:nrow(x) 
+xnew = x %>%
+  mutate(Diff_year =  observation - lag(observation),# Difference in time (just in case there are gaps)
+         Diff_growth = value - lag(value), # Difference in route between years
+         Rate_percent = (Diff_growth / Diff_year)/value * 100)
+real_growth_rate_dpi = subset(xnew, select = -c(observation, Diff_year, Diff_growth, value))
+
+autoplot(real_growth_rate_dpi) + labs(title="Box Cox Diff Data over time")
+ggAcf(real_growth_rate_dpi, lag.max = 24)
 
 #The transformed data is no longer trending. Generally the data seems to be cyclical in
 #having upward trending periods followed by downward trending periods, but it shows no seasonality
@@ -126,6 +131,8 @@ cpi <- USMacroG[,"cpi"]
 
 cpi_1 <- as_tsibble(USMacroG[,"cpi"])
 
+
+
 autoplot(cpi) + labs(y= "CPI $USD", title= "Consumption Expenditures over Time")
 ggAcf(cpi, lag.max = 24) + labs(y= "Autocorrelation", title= "Autocorrelation of CPI in the US")
 cpi_lambda <- BoxCox.lambda(USMacroG[,"cpi"])
@@ -134,16 +141,40 @@ BoxCox.lambda(cpi)
 BC_cpi = (BoxCox (cpi, cpi_lambda))
 autoplot(BoxCox(cpi, lambda=cpi_lambda))
 
-growth_cpi <- diff(BC_cpi)
-autoplot(growth_cpi) + labs(title="CPI Box Cox Diff Data over time")
-ggAcf(growth_cpi, lag.max = 24)
+y <- as_tsibble(BC_cpi)
+y$observation <- 1:nrow(y) 
+ynew = y %>%
+  mutate(Diff_year =  observation - lag(observation),# Difference in time (just in case there are gaps)
+         Diff_growth = value - lag(value), # Difference in route between years
+         Rate_percent = (Diff_growth / Diff_year)/value * 100)
+real_growth_rate_cpi = subset(xnew, select = -c(observation, Diff_year, Diff_growth, value))
+
+autoplot(real_growth_rate_cpi) + labs(title="Box Cox Diff Data over time")
+ggAcf(real_growth_rate_cpi, lag.max = 24)
 
 
-gcpil<- as_tsibble(growth_cpi)
+autoplot(real_growth_rate_cpi) + labs(title="CPI Box Cox Diff Data over time")
+ggAcf(real_growth_rate_cpi, lag.max = 24)
 
-cpi_dpi<- cbind(growth_cpi, growth_dpi)
+
+gcpil<- as_tsibble(real_growth_rate_cpi)
+gcpil
+gdpil<- as_tsibble(real_growth_rate_dpi)
+gdpil
+cpi_dpi <- gcpil %>% left_join(gdpil, by= Time)
+
+cpi_dpi<- bind_rows(gcpil, gdpil)
 autoplot(cpi_dpi)
+
+cpi_dpi
+
 
 #'*Issue with cpi values being too low*
 #'*Compare code to be sure that they actually work*
+#'
+
+
+
+cpi <- USMacroG[,"cpi"]
+
 
