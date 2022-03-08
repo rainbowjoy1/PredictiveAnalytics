@@ -75,10 +75,10 @@ ggAcf(real_growth_rate_dpi, lag.max = 24)
 
 #The transformed data is no longer trending. Generally the data seems to be cyclical in
 #having upward trending periods followed by downward trending periods, but it shows no seasonality
+growth_dpi_vector <- unlist(real_growth_rate_dpi)
+Box.test(growth_dpi_vector, type = c("Ljung-Box"), lag = 10)
 
-Box.test(growth_dpi, type = c("Ljung-Box"), lag = 10)
-
-gdpil<- as_tsibble(growth_dpi)
+gdpil<- as_tsibble(real_growth_rate_dpi)
 
 #we ran the Ljung-Box test to determine if the autcoerrelations are significantly different
 #than white noise. We found that the p-value is very small so the residuals are
@@ -167,3 +167,4 @@ cpi_dpi <- inner_join(gcpil, gdpil, by = "index")
 ggplot(cpi_dpi, aes(index)) + 
   geom_line(aes(y = Rate_percent.x, colour = "CPI Growth Rate")) + 
   geom_line(aes(y = Rate_percent.y, colour = "DPI Growth Rate"))
+
