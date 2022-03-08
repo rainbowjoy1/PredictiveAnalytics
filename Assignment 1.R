@@ -1,16 +1,18 @@
 #Assignment 1
 
 #library(ggfortify)
-library(forecast)
-#library(fpp3)
-#library(tidyr)
-#library(MASS)
-#library(caret)
 
+#library(fpp3)
+#library(tidyr) 
+library(MASS) #for mutate()
+#library(caret)
+library(forecast) #for BoxCox()
 library(fable)
 library(tsibble)
 library(ggplot2)
 library(AER)
+library(feasts) #for gg_tsresiduals()
+
 
 
 ###Question 1
@@ -26,7 +28,7 @@ data("USMacroG", package = "AER")
 summary(USMacroG)
 USMacroG
 dpi <- USMacroG[,"dpi"]
-dpi_l <- as_tsibble(USMacroG[,"dpi"])
+dpi_l <- as_tsibble(dpi)
 
 ####1. Create two plots, one for the disposable income series and one for its autocorrelation. What
 ####are the relevant features of the data? Can you confirm them from the autocorrelation function?
@@ -114,7 +116,7 @@ MAN %>% forecast(h=40) %>%
 Holt %>% forecast(h=40) %>%
   autoplot(Test,level=NULL) + ggtitle("Holt Forecast")
 
-best <- MAN %>% gg_tsdisplay(.resid, lag_max = 24, plot_type = "histogram")
+best <- MAN %>% gg_tsdisplay(.resid, lag_max = 24, plot_type = "histogram") # error'.resid' not found
 
 MAN %>%
   gg_tsresiduals()+ ggtitle("MAN Residuals")
@@ -129,7 +131,7 @@ Holt %>%
 
 cpi <- USMacroG[,"cpi"]
 
-cpi_1 <- as_tsibble(USMacroG[,"cpi"])
+cpi_1 <- as_tsibble(cpi)
 
 
 
