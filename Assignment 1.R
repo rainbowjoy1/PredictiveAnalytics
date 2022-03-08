@@ -27,8 +27,9 @@ data("USMacroG", package = "AER")
 summary(USMacroG)
 USMacroG
 dpi <- USMacroG[,"dpi"]
-
+dpi
 dpi_l <- as_tsibble(USMacroG[,"dpi"])
+dpi_l
 
 ####1. Create two plots, one for the disposable income series and one for its autocorrelation. What
 ####are the relevant features of the data? Can you confirm them from the autocorrelation function?
@@ -40,7 +41,7 @@ autoplot(dpi) + labs(y= "DPI $USD", title= "Disposible US Income over Time")
 #there is seasonality but if there is it is not strong. The graph is not smooth and has a 
 #clear upward trend.The data is not random and we think has a strong correlation
 
-ggAcf(dpi, lag.max = 300) + labs(y= "Autocorrelation", title= "Autocorrelation of DPI in the US")
+ggAcf(dpi, lag.max = 24) + labs(y= "Autocorrelation", title= "Autocorrelation of DPI in the US")
 
 #The correlation proves that there is strong correlation between dpi over time. It shows that the 
 #relationship is correlated, positive, and trending upward over time. It does not highlight 
@@ -68,7 +69,7 @@ autoplot(BoxCox(dpi, lambda=dpi_lambda))
 
 growth_dpi <- diff(BC_dpi)
 autoplot(growth_dpi) + labs(title="Box Cox Diff Data over time")
-ggAcf(growth_dpi, lag.max = 300)
+ggAcf(growth_dpi, lag.max = 24)
 
 #The transformed data is no longer trending. Generally the data seems to be cyclical in
 #having upward trending periods followed by downward trending periods, but it shows no seasonality
@@ -85,20 +86,8 @@ gdpil<- as_tsibble(growth_dpi)
 ####from the ETS class (hint: use one model ???guessed??? and one model automatically selected).
 ####Discuss the models and their residuals (include a test on residuals autocorrelation).
 
-
-#This is the "right" way to train/test code BUT it is leading to major issues with the 
-#models because they are not in proper time order....
-
-#Below the line of hash I will rewrite everything to be done with "window"
-
-smp_size <- floor(0.8 * nrow(gdpil))
-
-set.seed(123)
-train_ind <- sample(seq_len(nrow(gdpil)), size = smp_size)
-
-train <- gdpil[train_ind, ]
-test <- gdpil[-train_ind, ]
-
+Train <- gdpil %>% slice(1:163)
+Test <- gdpil %>% slice(164:203)
 
 fit <- gdpil %>%
   model(ETS(value))
@@ -106,21 +95,18 @@ report(fit)
 
 #Report says the A,N,N model is ideal
 
-train %>%
+Train %>%
   stretch_tsibble(.init = 10) %>%
   model(
     SES = ETS(value ~ error("A") + trend("N") + season("N")),
     Holt = ETS(value ~ error("A") + trend("A") + season("N")),
   ) %>%
   forecast(h = 20) %>%
-  accuracy(train)
+  accuracy(Train)
 
-
-###########################################################################################
-
-growth.USIncTrain <- window(gdpil, end = "1990 Q1")
-growth.USIncTest <- window(gdpil, start = 1950 Q1)
-
+print(Train, n=203)
+gdpil
+Test
 
 ####4. Now forecast the test set, plot the two forecasts with the original data into two separate
 ####graphs (one for each model), and evaluate the accuracy of the two models.
@@ -136,7 +122,7 @@ cpi <- USMacroG[,"cpi"]
 cpi_1 <- as_tsibble(USMacroG[,"cpi"])
 
 autoplot(cpi) + labs(y= "CPI $USD", title= "Consumption Expenditures over Time")
-ggAcf(cpi, lag.max = 300) + labs(y= "Autocorrelation", title= "Autocorrelation of CPI in the US")
+ggAcf(cpi, lag.max = 24) + labs(y= "Autocorrelation", title= "Autocorrelation of CPI in the US")
 cpi_lambda <- BoxCox.lambda(USMacroG[,"cpi"])
 
 BoxCox.lambda(cpi)
@@ -145,7 +131,7 @@ autoplot(BoxCox(cpi, lambda=cpi_lambda))
 
 growth_cpi <- diff(BC_cpi)
 autoplot(growth_cpi) + labs(title="CPI Box Cox Diff Data over time")
-ggAcf(growth_cpi, lag.max = 300)
+ggAcf(growth_cpi, lag.max = 24)
 
 
 gcpil<- as_tsibble(growth_cpi)
