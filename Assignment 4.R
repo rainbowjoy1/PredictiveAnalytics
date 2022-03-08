@@ -12,4 +12,8 @@ library(caret)
 
 vic_elec
 head(vic_elec)
-vic_elec %>% 
+
+jan_vic_elec<- vic_elec %>%
+  filter(yearmonth(Time)== yearmonth("2014 Jan")) %>%
+  index_by(Date= as_date(Time)) %>%
+  summarise(Demand= sum(Demand), Temperature
