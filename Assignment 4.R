@@ -42,3 +42,16 @@ summarise(Demand= sum(Demand), Temperature= max(Temperature))
 jan_vic_elec
 
 autoplot(jan_vic_elec)
+
+# Create a dataframe of new diamond data
+demand.new <- data.frame(weight = c(12, 6, 5),
+                           clarity = c(1.3, 1, 1.5),
+                           color = c(5, 2, 3))
+
+# Predict the value of the new diamonds using
+#  the diamonds.lm regression model
+predict(object = diamonds.lm,     # The regression model
+        newdata = diamonds.new)   # dataframe of new data
+
+
+
