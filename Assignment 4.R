@@ -16,4 +16,7 @@ head(vic_elec)
 jan_vic_elec<- vic_elec %>%
   filter(yearmonth(Time)== yearmonth("2014 Jan")) %>%
   index_by(Date= as_date(Time)) %>%
-  summarise(Demand= sum(Demand), Temperature
+  summarise(Demand= sum(Demand), Temperature= max(Temperature))
+jan_vic_elec
+
+autoplot(jan_vic_elec)
