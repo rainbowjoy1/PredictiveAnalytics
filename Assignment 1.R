@@ -1,16 +1,17 @@
 #Assignment 1
 
-#Currently not all packages are being used. Uploaded for ease later
-library(ggplot2)
-library(ggfortify)
-library(forecast)
-library(fpp3)
-library(tidyr)
-library(fable)
+#library(ggfortify)
+#library(forecast)
+#library(fpp3)
+#library(tidyr)
+#library(fable)
+#library(MASS)
+#library(caret)
+
+
 library(tsibble)
+library(ggplot2)
 library(AER)
-library(MASS)
-library(caret)
 
 
 ###Question 1
@@ -117,7 +118,7 @@ train %>%
 
 ###########################################################################################
 
-growth.USIncTrain <- window(gdpil, end = 1990 Q1)
+growth.USIncTrain <- window(gdpil, end = "1990 Q1")
 growth.USIncTest <- window(gdpil, start = 1950 Q1)
 
 
@@ -155,3 +156,4 @@ autoplot(cpi_dpi)
 #trying to make a single line that is the difference of the diffs to see if there is any relation
 
 cpi_dpi$V3 <- cpi_dpi - cpi_dpi$V2
+
