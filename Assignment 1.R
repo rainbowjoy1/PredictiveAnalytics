@@ -4,11 +4,10 @@
 #library(forecast)
 #library(fpp3)
 #library(tidyr)
-#library(fable)
 #library(MASS)
 #library(caret)
 
-
+library(fable)
 library(tsibble)
 library(ggplot2)
 library(AER)
@@ -89,27 +88,23 @@ gdpil<- as_tsibble(growth_dpi)
 Train <- gdpil %>% slice(1:163)
 Test <- gdpil %>% slice(164:203)
 
-fit <- gdpil %>%
+fit <- Train %>%
   model(ETS(value))
 report(fit)
 
 #Report says the A,N,N model is ideal
 
-Train %>%
+models <- Train %>%
   stretch_tsibble(.init = 10) %>%
   model(
     SES = ETS(value ~ error("A") + trend("N") + season("N")),
     Holt = ETS(value ~ error("A") + trend("A") + season("N")),
-  ) %>%
-  forecast(h = 20) %>%
-  accuracy(Train)
+  ) 
 
-print(Train, n=203)
-gdpil
-Test
 
 ####4. Now forecast the test set, plot the two forecasts with the original data into two separate
 ####graphs (one for each model), and evaluate the accuracy of the two models.
+
 
 
 ####5. Pick the real consumption expenditures and transform the series to create a series for the
