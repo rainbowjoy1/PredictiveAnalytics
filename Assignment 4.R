@@ -32,4 +32,4 @@ plot(fitted(model), res)
 qqnorm(res)
 qqline(res)
 plot(density(res))
-#ddaacda
+#ddaacdadsada
