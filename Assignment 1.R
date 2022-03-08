@@ -1,7 +1,7 @@
 #Assignment 1
 
 #library(ggfortify)
-#library(forecast)
+library(forecast)
 #library(fpp3)
 #library(tidyr)
 #library(MASS)
