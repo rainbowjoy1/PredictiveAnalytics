@@ -117,11 +117,8 @@ MAN %>% forecast(h=40) %>%
 Holt %>% forecast(h=40) %>%
   autoplot(Test,level=NULL) + ggtitle("Holt Forecast")
 
-<<<<<<< HEAD
-=======
 best <- MAN %>% gg_tsdisplay(.resid, lag_max = 24, plot_type = "histogram") # error'.resid' not found
 
->>>>>>> 9f46adac603dba3bb314cfb06983e812e91db7ca
 MAN %>%
   gg_tsresiduals()+ ggtitle("MAN Residuals")
 
