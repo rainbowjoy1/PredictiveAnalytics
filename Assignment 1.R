@@ -109,9 +109,13 @@ MAN %>% forecast(h=40) %>%
 Holt %>% forecast(h=40) %>%
   autoplot(Test,level=NULL) + ggtitle("Holt Forecast")
 
+best <- MAN %>% gg_tsdisplay(.resid, lag_max = 24, plot_type = "histogram")
 
+MAN %>%
+  gg_tsresiduals()+ ggtitle("MAN Residuals")
 
-#'*Run correleograms*
+Holt %>%
+  gg_tsresiduals() + ggtitle("Holt Residuals")
 
 ####5. Pick the real consumption expenditures and transform the series to create a series for the
 ####growth rate quarter on quarter. Plot the growth rate of real consumption expenditures against 
