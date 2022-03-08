@@ -64,13 +64,14 @@ BoxCox.lambda(dpi)
 BC_dpi = (BoxCox (dpi, dpi_lambda))
 autoplot(BoxCox(dpi, lambda=dpi_lambda))
 
-x <- as_tsibble(BC_dpi)
-x$observation <- 1:nrow(x) 
-xnew = x %>%
+dpi.ts <- as_tsibble(BC_dpi)
+dpi.ts$observation <- 1:nrow(dpi.ts) 
+dpi.expand = dpi.ts %>%
   mutate(Diff_year =  observation - lag(observation),# Difference in time (just in case there are gaps)
          Diff_growth = value - lag(value), # Difference in route between years
          Rate_percent = (Diff_growth / Diff_year)/value * 100)
-real_growth_rate_dpi = subset(xnew, select = -c(observation, Diff_year, Diff_growth, value))
+
+real_growth_rate_dpi = subset(dpi.expand, select = -c(observation, Diff_year, Diff_growth, value))
 
 autoplot(real_growth_rate_dpi) + labs(title="Box Cox Diff Data over time")
 ggAcf(real_growth_rate_dpi, lag.max = 24)
@@ -114,8 +115,6 @@ MAN %>% forecast(h=40) %>%
 Holt %>% forecast(h=40) %>%
   autoplot(Test,level=NULL) + ggtitle("Holt Forecast")
 
-best <- MAN %>% gg_tsdisplay(.resid, lag_max = 24, plot_type = "histogram")
-
 MAN %>%
   gg_tsresiduals()+ ggtitle("MAN Residuals")
 
@@ -141,13 +140,17 @@ BoxCox.lambda(cpi)
 BC_cpi = (BoxCox (cpi, cpi_lambda))
 autoplot(BoxCox(cpi, lambda=cpi_lambda))
 
-y <- as_tsibble(BC_cpi)
-y$observation <- 1:nrow(y) 
-ynew = y %>%
-  mutate(Diff_year =  observation - lag(observation),# Difference in time (just in case there are gaps)
-         Diff_growth = value - lag(value), # Difference in route between years
+cpi.ts <- as_tsibble(BC_cpi)
+cpi.ts$observation <- 1:nrow(cpi.ts) 
+cpi.expand = cpi.ts %>%
+  mutate(Diff_year =  observation - lag(observation),
+         Diff_growth = value - lag(value),
          Rate_percent = (Diff_growth / Diff_year)/value * 100)
-real_growth_rate_cpi = subset(xnew, select = -c(observation, Diff_year, Diff_growth, value))
+
+print(ynew, n=300)
+
+real_growth_rate_cpi = subset(cpi.expand, select = -c(observation, Diff_year, Diff_growth, value))
+real_growth_rate_cpi
 
 autoplot(real_growth_rate_cpi) + labs(title="Box Cox Diff Data over time")
 ggAcf(real_growth_rate_cpi, lag.max = 24)
@@ -158,23 +161,10 @@ ggAcf(real_growth_rate_cpi, lag.max = 24)
 
 
 gcpil<- as_tsibble(real_growth_rate_cpi)
-gcpil
 gdpil<- as_tsibble(real_growth_rate_dpi)
-gdpil
-cpi_dpi <- gcpil %>% left_join(gdpil, by= Time)
 
-cpi_dpi<- bind_rows(gcpil, gdpil)
-autoplot(cpi_dpi)
+cpi_dpi <- inner_join(gcpil, gdpil, by = "index")
 
-cpi_dpi
-
-
-#'*Issue with cpi values being too low*
-#'*Compare code to be sure that they actually work*
-#'
-
-
-
-cpi <- USMacroG[,"cpi"]
-
-
+ggplot(cpi_dpi, aes(index)) + 
+  geom_line(aes(y = Rate_percent.x, colour = "Rate_Percent.x")) + 
+  geom_line(aes(y = Rate_percent.y, colour = "Rate_percent.y"))
