@@ -77,35 +77,41 @@ Box.test(growth_dpi, type = c("Ljung-Box"), lag = 10)
 
 gdpil<- as_tsibble(growth_dpi)
 
-#we ran the Ljung-Box test to determine if the autocerrelations are significantly different
+#we ran the Ljung-Box test to determine if the autcoerrelations are significantly different
 #than white noise. We found that the p-value is very small so the residuals are
-#distinguisable from white noise and autocorrelation exsists.
+#distinguishable from white noise and autocorrelation exists.
 
 ####3. Split the sample into a training and a test set. Fit the level of disposable income with 2 models
 ####from the ETS class (hint: use one model ???guessed??? and one model automatically selected).
 ####Discuss the models and their residuals (include a test on residuals autocorrelation).
 
-Train <- gdpil %>% slice(1:163)
-Test <- gdpil %>% slice(164:203)
+Train <- dpi_l %>% slice(1:163)
+Test <- dpi_l %>% slice(163:203)
 
-fit <- Train %>%
-  model(ETS(value))
-report(fit)
+MAN <- Train %>% model(MAN = ETS(value))
 
-#Report says the A,N,N model is ideal
+report(MAN)
 
-models <- Train %>%
-  stretch_tsibble(.init = 10) %>%
-  model(
-    SES = ETS(value ~ error("A") + trend("N") + season("N")),
-    Holt = ETS(value ~ error("A") + trend("A") + season("N")),
-  ) 
+#'Report says the M,A,N model is ideal because the ETS model is trained on the original data
+#'Which is exponential so the ETS suggests a multiplicative model. 
+
+
+Holt <- Train %>%
+  model(Holt = ETS(value ~ error("A") + trend("A") + season("N"))) 
 
 
 ####4. Now forecast the test set, plot the two forecasts with the original data into two separate
 ####graphs (one for each model), and evaluate the accuracy of the two models.
 
+MAN %>% forecast(h=40) %>%
+  autoplot(Test,level=NULL)+ ggtitle("MAN Forecast")
 
+Holt %>% forecast(h=40) %>%
+  autoplot(Test,level=NULL) + ggtitle("Holt Forecast")
+
+
+
+#'*Run correleograms*
 
 ####5. Pick the real consumption expenditures and transform the series to create a series for the
 ####growth rate quarter on quarter. Plot the growth rate of real consumption expenditures against 
@@ -134,7 +140,6 @@ gcpil<- as_tsibble(growth_cpi)
 cpi_dpi<- cbind(growth_cpi, growth_dpi)
 autoplot(cpi_dpi)
 
-#trying to make a single line that is the difference of the diffs to see if there is any relation
-
-cpi_dpi$V3 <- cpi_dpi - cpi_dpi$V2
+#'*Issue with cpi values being too low*
+#'*Compare code to be sure that they actually work*
 
