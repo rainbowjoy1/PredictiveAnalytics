@@ -70,7 +70,7 @@ dpi.expand = dpi.ts %>%
 
 real_growth_rate_dpi = subset(dpi.expand, select = -c(observation, Diff_year, Diff_growth, value))
 
-autoplot(real_growth_rate_dpi) + labs(title="Box Cox Diff Data over time")
+autoplot(real_growth_rate_dpi) + labs(title="DPI growth rate over time")
 ggAcf(real_growth_rate_dpi, lag.max = 24)
 
 #The transformed data is no longer trending. Generally the data seems to be cyclical in
@@ -112,7 +112,6 @@ MAN %>% forecast(h=40) %>%
 Holt %>% forecast(h=40) %>%
   autoplot(Test,level=NULL) + ggtitle("Holt Forecast")
 
-best <- MAN %>% gg_tsdisplay(.resid, lag_max = 24, plot_type = "histogram") # error'.resid' not found
 
 MAN %>%
   gg_tsresiduals()+ ggtitle("MAN Residuals")
@@ -120,6 +119,7 @@ MAN %>%
 Holt %>%
   gg_tsresiduals() + ggtitle("Holt Residuals")
 
+#best <- MAN %>% gg_tsdisplay(Test, lag_max = 24, plot_type = "histogram") # error'.resid' not found
 ####5. Pick the real consumption expenditures and transform the series to create a series for the
 ####growth rate quarter on quarter. Plot the growth rate of real consumption expenditures against 
 ####the growth rate of disposable income. Do you think there is any relation?
@@ -128,7 +128,6 @@ Holt %>%
 cpi <- USMacroG[,"cpi"]
 
 cpi_1 <- as_tsibble(cpi)
-
 
 
 autoplot(cpi) + labs(y= "CPI $USD", title= "Consumption Expenditures over Time")
@@ -145,8 +144,6 @@ cpi.expand = cpi.ts %>%
   mutate(Diff_year =  observation - lag(observation),
          Diff_growth = value - lag(value),
          Rate_percent = (Diff_growth / Diff_year)/value * 100)
-
-print(ynew, n=300)
 
 real_growth_rate_cpi = subset(cpi.expand, select = -c(observation, Diff_year, Diff_growth, value))
 real_growth_rate_cpi
