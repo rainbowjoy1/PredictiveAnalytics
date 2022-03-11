@@ -119,7 +119,9 @@ MAN %>%
 Holt %>%
   gg_tsresiduals() + ggtitle("Holt Residuals")
 
-best <- MAN %>% gg_tsdisplay(.resid, lag_max = 24, plot_type = "histogram") # error'.resid' not found
+MAN %>% forecast(h=40) %>% accuracy(Test)
+Holt %>% forecast(h=40) %>% accuracy(Test)
+
 
 ####5. Pick the real consumption expenditures and transform the series to create a series for the
 ####growth rate quarter on quarter. Plot the growth rate of real consumption expenditures against 
