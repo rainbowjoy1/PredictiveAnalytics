@@ -49,7 +49,8 @@ demand.new <- data.frame(Temperature= c(35, 15))
 # Predict the value of the new diamonds using
 #  the diamonds.lm regression model
 predict(object = model,     # The regression model
-        newdata = demand.new)   # dataframe of new data
+        newdata = demand.new)   # data frame of new data
 
 
+#Insert prediction intervals
 
