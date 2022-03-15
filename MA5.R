@@ -16,3 +16,10 @@ fit <- jan_vic_elec %>%
 #forecast 15
 
 fit %>% forecast(h=2) %>% autoplot()
+
+
+### 7.4
+
+fit <- souvenirs %>%
+  mutate(festival = month(Month) == 3 & year(Month) != 1987) %>%
+  model(reg = TSLM(log(Sales) ~ trend() + season() + festival))
