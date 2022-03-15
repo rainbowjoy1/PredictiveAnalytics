@@ -70,15 +70,15 @@ dpi.expand = dpi.ts %>%
 
 real_growth_rate_dpi = subset(dpi.expand, select = -c(observation, Diff_year, Diff_growth, value))
 
-autoplot(real_growth_rate_dpi) + labs(title="Box Cox Diff Data over time")
+autoplot(real_growth_rate_dpi) + labs(title="Box-cox: DPI growth rate over time")
 ggAcf(real_growth_rate_dpi, lag.max = 24)
 
 #The transformed data is no longer trending. Generally the data seems to be cyclical in
 #having upward trending periods followed by downward trending periods, but it shows no seasonality
+growth_dpi_vector <- unlist(real_growth_rate_dpi)
+Box.test(growth_dpi_vector, type = c("Ljung-Box"), lag = 10)
 
-Box.test(growth_dpi, type = c("Ljung-Box"), lag = 10)
-
-gdpil<- as_tsibble(growth_dpi)
+gdpil<- as_tsibble(real_growth_rate_dpi)
 
 #we ran the Ljung-Box test to determine if the autcoerrelations are significantly different
 #than white noise. We found that the p-value is very small so the residuals are
@@ -112,7 +112,6 @@ MAN %>% forecast(h=40) %>%
 Holt %>% forecast(h=40) %>%
   autoplot(Test,level=NULL) + ggtitle("Holt Forecast")
 
-best <- MAN %>% gg_tsdisplay(.resid, lag_max = 24, plot_type = "histogram") # error'.resid' not found
 
 MAN %>%
   gg_tsresiduals()+ ggtitle("MAN Residuals")
@@ -120,16 +119,17 @@ MAN %>%
 Holt %>%
   gg_tsresiduals() + ggtitle("Holt Residuals")
 
+MAN %>% forecast(h=40) %>% accuracy(Test)
+Holt %>% forecast(h=40) %>% accuracy(Test)
+
+
 ####5. Pick the real consumption expenditures and transform the series to create a series for the
 ####growth rate quarter on quarter. Plot the growth rate of real consumption expenditures against 
 ####the growth rate of disposable income. Do you think there is any relation?
 
 
 cpi <- USMacroG[,"cpi"]
-
 cpi_1 <- as_tsibble(cpi)
-
-
 
 autoplot(cpi) + labs(y= "CPI $USD", title= "Consumption Expenditures over Time")
 ggAcf(cpi, lag.max = 24) + labs(y= "Autocorrelation", title= "Autocorrelation of CPI in the US")
@@ -146,10 +146,7 @@ cpi.expand = cpi.ts %>%
          Diff_growth = value - lag(value),
          Rate_percent = (Diff_growth / Diff_year)/value * 100)
 
-print(ynew, n=300)
-
 real_growth_rate_cpi = subset(cpi.expand, select = -c(observation, Diff_year, Diff_growth, value))
-real_growth_rate_cpi
 
 autoplot(real_growth_rate_cpi) + labs(title="Box Cox Diff Data over time")
 ggAcf(real_growth_rate_cpi, lag.max = 24)
@@ -167,3 +164,4 @@ cpi_dpi <- inner_join(gcpil, gdpil, by = "index")
 ggplot(cpi_dpi, aes(index)) + 
   geom_line(aes(y = Rate_percent.x, colour = "CPI Growth Rate")) + 
   geom_line(aes(y = Rate_percent.y, colour = "DPI Growth Rate"))
+
