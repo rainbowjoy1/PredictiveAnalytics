@@ -7,3 +7,4 @@ jan_vic_elec <- vic_elec %>%
   summarise(Demand = sum(Demand), Temperature = max(Temperature))
 fit <- jan_vic_elec %>%
   model(TSLM(Demand ~ Temperature))
+
