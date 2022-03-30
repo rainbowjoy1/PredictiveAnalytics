@@ -6,7 +6,7 @@
 
 
 #read the csv file
-emp <- read.csv("C:/Users/danie/Downloads/emp.csv", header=TRUE)
+emp <- read.csv("emp.csv", header=TRUE)
 
 emp
 
