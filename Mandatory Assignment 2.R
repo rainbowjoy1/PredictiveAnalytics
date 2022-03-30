@@ -45,6 +45,10 @@ autoplot(decompose(emp.ts, type = c("multiplicative")))+
 #'*strong seasonality and some cycles. It is important to note that we used classical multiplicative decomposition*
 #'*Which assumes that there is a seasonal component and that it is constant from year to year so it is possible*
 #'*that the seasonal element is overtstated*
+#'
+#'*A more accurate, but more time consuming, method would be to take the data and use STL*
+#'*but we would have to run the Guerrero feature to determine the lambda so we can run a Box-Cox transformation*
+#'*because our data is somewhere between additive and multiplicative*
 
 
 
