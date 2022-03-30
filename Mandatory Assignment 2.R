@@ -1,3 +1,4 @@
+#try write by Annaya
 ###Part 1
 #1. Plot the data and the autocorrelation function. Decompose your time series into trend, cycle,
 #and seasonal component with a methodology of your choice (classical decomposition, SEATS, etc). 
