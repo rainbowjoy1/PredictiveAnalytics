@@ -45,12 +45,18 @@ autoplot(decompose(emp.ts, type = c("multiplicative")))+
 #'*strong seasonality and some cycles. It is important to note that we used classical multiplicative decomposition*
 #'*Which assumes that there is a seasonal component and that it is constant from year to year so it is possible*
 #'*that the seasonal element is overtstated*
+#'
+#'*A more accurate, but more time consuming, method would be to take the data and use STL*
+#'*but we would have to run the Guerrero feature to determine the lambda so we can run a Box-Cox transformation*
+#'*because our data is somewhere between additive and multiplicative*
 
 
 
 #2. Transform your data by taking natural logarithm or with Box and Cox methodology. Repeat
 #the analysis of point 1.1: how does it change? Decide whether to use original or transformed
 #data in the rest of the assignment. Motivate your choice.
+
+####Note to do run guerro and then a box cox based on returned lambda
 
 
 #3. Based on the results in point 1.1 and the choice in point 1.2, discuss what is the most accurate
