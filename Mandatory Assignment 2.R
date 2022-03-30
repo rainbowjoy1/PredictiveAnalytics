@@ -19,7 +19,23 @@ summary(emp)
 
 plot(emp)
 
+month <- apply.monthly(emp, mean)
+
+data<- emp
+
+# create month and year column
+data$month = lubridate::month(data$DATE)
+data$year = lubridate::year(data$DATE)
+
+# view data
+head(data)
+
+# summarize data as needed
+memp <- data %>% group_by(year,month) %>% summarize(numMean = mean(CE16OV)) %>% as.data.frame
+
 ts_emp <- as_tsibble(emp)
+
+fill_gaps(ts_emp)
 
 ts_emp %>%
   ACF("CE16OV") %>%
