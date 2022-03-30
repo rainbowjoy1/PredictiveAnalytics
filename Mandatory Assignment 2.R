@@ -4,11 +4,18 @@
 #and seasonal component with a methodology of your choice (classical decomposition, SEATS, etc). 
 #Discuss the properties of the series and the limitation of the methodology you choose (5 lines).
 
+library(ggplot2)
+library(dplyr)
 
 #read the csv file
 emp <- read.csv("emp.csv", header=TRUE)
 
-emp
+emp[["DATE"]] <- as.Date(emp[["DATE"]])
+
+dim(emp)
+summary(emp)
+
+ggplot(emp)
 
 #2. Transform your data by taking natural logarithm or with Box and Cox methodology. Repeat
 #the analysis of point 1.1: how does it change? Decide whether to use original or transformed
