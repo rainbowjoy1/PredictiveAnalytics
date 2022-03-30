@@ -6,6 +6,8 @@
 
 library(ggplot2)
 library(dplyr)
+library(fpp3)
+library(tsibble)
 
 #read the csv file
 emp <- read.csv("emp.csv", header=TRUE)
@@ -15,7 +17,14 @@ emp[["DATE"]] <- as.Date(emp[["DATE"]])
 dim(emp)
 summary(emp)
 
-ggplot(emp)
+plot(emp)
+
+ts_emp <- as_tsibble(emp)
+
+ts_emp %>%
+  ACF("CE16OV") %>%
+  autoplot() + labs(title="EMP")
+
 
 #2. Transform your data by taking natural logarithm or with Box and Cox methodology. Repeat
 #the analysis of point 1.1: how does it change? Decide whether to use original or transformed
