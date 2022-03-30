@@ -33,6 +33,10 @@ acfplot <- ggAcf(emp.ts, )+ ggtitle("ACF of Data")
 #arrange the plots into one image
 grid.arrange(auto, acfplot)
 
+autoplot(decompose(emp.ts, type = c("multiplicative")))+
+  labs(title = "Multiplicative Decomposition on the Dataset")
+
+
 
 #2. Transform your data by taking natural logarithm or with Box and Cox methodology. Repeat
 #the analysis of point 1.1: how does it change? Decide whether to use original or transformed
