@@ -2,7 +2,7 @@
 ###Part 1
 #1. Plot the data and the autocorrelation function. Decompose your time series into trend, cycle,
 #and seasonal component with a methodology of your choice (classical decomposition, SEATS, etc). 
-#Discuss the properties of the series and the limitation of the methodology you choose (5 lines).
+#Discuss the properties of the series and the limitation of the methodology you chose (5 lines).
 
 library(ggplot2)
 library(ggfortify)
@@ -35,6 +35,16 @@ grid.arrange(auto, acfplot)
 
 autoplot(decompose(emp.ts, type = c("multiplicative")))+
   labs(title = "Multiplicative Decomposition on the Dataset")
+
+#'*Our time series, at first glance, shows no strong seasonality or cycle but shows a strong*
+#'*trend upwards. The data could contain some cycles as seen in the small repeated slumps and* 
+#'*inclines of the line. The data could be multiplicative due to the small curve near the bottom of the line.*
+#'*The auto correlations show a very strong significant correlation.* 
+#'
+#'*Our decomposition shows that there is a strong trend in the data. It also shows that there is* 
+#'*strong seasonality and some cycles. It is important to note that we used classical multiplicative decomposition*
+#'*Which assumes that there is a seasonal component and that it is constant from year to year so it is possible*
+#'*that the seasonal element is overtstated*
 
 
 
