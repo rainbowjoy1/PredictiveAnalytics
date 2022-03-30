@@ -5,41 +5,33 @@
 #Discuss the properties of the series and the limitation of the methodology you choose (5 lines).
 
 library(ggplot2)
+library(ggfortify)
+library(forecast)
 library(dplyr)
 library(fpp3)
 library(tsibble)
+library(gridExtra)
 
-#read the csv file
+#read the csv file from github repository
 emp <- read.csv("emp.csv", header=TRUE)
 
+#convert the date column to date format
 emp[["DATE"]] <- as.Date(emp[["DATE"]])
 
+#examine the data
 dim(emp)
 summary(emp)
 
-plot(emp)
+#convert the data to a time series to allow the SCF to run an dplace the data in monthly format
+emp.ts <- ts(emp[,2], start = c(1948,1), end = c(2007,12), frequency = 12)
 
-month <- apply.monthly(emp, mean)
 
-data<- emp
+#generate plots of the data
+auto <- autoplot(emp.ts)+ ylab("")+ggtitle("Plot of Time Series Data")
+acfplot <- ggAcf(emp.ts, )+ ggtitle("ACF of Data")
 
-# create month and year column
-data$month = lubridate::month(data$DATE)
-data$year = lubridate::year(data$DATE)
-
-# view data
-head(data)
-
-# summarize data as needed
-memp <- data %>% group_by(year,month) %>% summarize(numMean = mean(CE16OV)) %>% as.data.frame
-
-ts_emp <- as_tsibble(emp)
-
-fill_gaps(ts_emp)
-
-ts_emp %>%
-  ACF("CE16OV") %>%
-  autoplot() + labs(title="EMP")
+#arrange the plots into one image
+grid.arrange(auto, acfplot)
 
 
 #2. Transform your data by taking natural logarithm or with Box and Cox methodology. Repeat
