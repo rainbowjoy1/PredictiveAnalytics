@@ -4,6 +4,8 @@
 #and seasonal component with a methodology of your choice (classical decomposition, SEATS, etc). 
 #Discuss the properties of the series and the limitation of the methodology you chose (5 lines).
 
+install.packages("latex2exp")
+
 library(ggplot2)
 library(ggfortify)
 library(forecast)
@@ -11,6 +13,8 @@ library(dplyr)
 library(fpp3)
 library(tsibble)
 library(gridExtra)
+library(latex2exp)
+
 
 #read the csv file from github repository
 emp <- read.csv("emp.csv", header=TRUE)
@@ -50,13 +54,16 @@ autoplot(decompose(emp.ts, type = c("multiplicative")))+
 #'*but we would have to run the Guerrero feature to determine the lambda so we can run a Box-Cox transformation*
 #'*because our data is somewhere between additive and multiplicative*
 
-
-
 #2. Transform your data by taking natural logarithm or with Box and Cox methodology. Repeat
 #the analysis of point 1.1: how does it change? Decide whether to use original or transformed
 #data in the rest of the assignment. Motivate your choice.
 
 ####Note to do run guerro and then a box cox based on returned lambda
+
+lambda <- guerrero(emp.ts)
+
+plot.ts(box_cox(emp.ts, lambda), ylab= "", main = latex2exp::TeX(paste0("Transformed EMP data with $\\lambda$ = ", round(lambda,2))))
+
 
 
 #3. Based on the results in point 1.1 and the choice in point 1.2, discuss what is the most accurate
