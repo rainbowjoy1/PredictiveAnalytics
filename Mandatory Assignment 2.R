@@ -14,6 +14,7 @@ library(fpp3)
 library(tsibble)
 library(gridExtra)
 library(latex2exp)
+library(tseries)
 
 
 #read the csv file from github repository
@@ -62,14 +63,23 @@ autoplot(decompose(emp.ts, type = c("multiplicative")))+
 
 lambda <- guerrero(emp.ts)
 
-plot.ts(box_cox(emp.ts, lambda), ylab= "", main = latex2exp::TeX(paste0("Transformed EMP data with $\\lambda$ = ", round(lambda,2))))
+bx.emp <- box_cox(emp.ts, lambda)
 
+plot.ts(bx.emp, ylab= "", main = latex2exp::TeX(paste0("Transformed EMP data with $\\lambda$ = ", round(lambda,2))))
 
+#'*Our data has changed primerilly by being less multiplicative. The data is far more linear and seasonality/trends* 
+#'*seem to be more obvious. Because we ran a Guerrero test and it did not return a 1 lambda value the data*
+#'*does need to be transformed because it is nonlinear*
 
 #3. Based on the results in point 1.1 and the choice in point 1.2, discuss what is the most accurate
 #functional form for the KPSS and ADF tests. Then, perform both tests to check stationarity
 #and discuss the results.
 
+
+kpss.test(bx.emp, null="Trend")
+#this makes literally no sense. Our data clearly is trending upward so it is not stationary but our KPSS p-vlaue is very low. wtf
+
+adf.test(bx.emp)
 
 #4. If the series is not stationary, follow the approach presented in class to make it stationary.
 #When the series is stationary, look at the autocorrelation and partial autocorrelation function,
