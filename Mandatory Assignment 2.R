@@ -4,7 +4,6 @@
 #and seasonal component with a methodology of your choice (classical decomposition, SEATS, etc). 
 #Discuss the properties of the series and the limitation of the methodology you chose (5 lines).
 
-install.packages("latex2exp")
 
 library(ggplot2)
 library(ggfortify)
@@ -15,6 +14,7 @@ library(tsibble)
 library(gridExtra)
 library(latex2exp)
 library(tseries)
+library(urca)
 
 
 #read the csv file from github repository
@@ -67,7 +67,7 @@ bx.emp <- box_cox(emp.ts, lambda)
 
 plot.ts(bx.emp, ylab= "", main = latex2exp::TeX(paste0("Transformed EMP data with $\\lambda$ = ", round(lambda,2))))
 
-#'*Our data has changed primerilly by being less multiplicative. The data is far more linear and seasonality/trends* 
+#'*Our data has changed primarily by being less multiplicative. The data is far more linear and seasonality/trends* 
 #'*seem to be more obvious. Because we ran a Guerrero test and it did not return a 1 lambda value the data*
 #'*does need to be transformed because it is nonlinear*
 
@@ -76,16 +76,55 @@ plot.ts(bx.emp, ylab= "", main = latex2exp::TeX(paste0("Transformed EMP data wit
 #and discuss the results.
 
 
+######Maybe should change to ur.adf functions? 
+
+#'*Based on the data shown in part 1 the data is best represented by a random walk with drift.*
+#'*This means that we should use tau for a KPSS formua and trend with AIC for DF test*
+
 kpss.test(bx.emp, null="Trend")
-#this makes literally no sense. Our data clearly is trending upward so it is not stationary but our KPSS p-vlaue is very low. wtf
+summary(ur.kpss(bx.emp, type = c("tau")))
+
+###Not sure which one to keep^
+
+#'*In this test our null hypothesis is that the data is stationary. So small p-values*
+#'*(smaller than .05) tell us that we need to use differencing. Since our returned p-value*
+#'*is .01 we can reject the null hypothesis and determine that the data is not stationary.*
 
 adf.test(bx.emp)
+summary(ur.df(bx.emp,type="trend",selectlags = "AIC"))
+
+#'*The adf test has a null hypothesis that there is a unit root. The alternate hypothesis*
+#'*says that the time series is stationary. The ADF test returned a p-value of .3226 because*
+#'*it is not less than .05 we fail to reject the null hypothesis and conclude that our data is non-stationary*
 
 #4. If the series is not stationary, follow the approach presented in class to make it stationary.
 #When the series is stationary, look at the autocorrelation and partial autocorrelation function,
 #choose an ARIMA model for the series and write down the equation of the model in the form
 #ARIMA(p,d,q)(P,D,Q)[m]. (Hint: if there is a deterministic trend, you need to detrend the time series)
 
+ndiffs(
+  bx.emp,
+  alpha = 0.05,
+  test = c("kpss"),
+  type = c("trend"))
+
+#'*To determine how many diffs we should take we ran ndiffs via kpss. It determined we should*
+#'*run one diff.*
+
+emp.dif <- diff(bx.emp)
+  
+kpss.test(emp.dif, null="Trend")
+adf.test(emp.dif)
+
+
+
+dif.ACK <- ggAcf(emp.dif)+ ggtitle("ACF of Stationary B-C Data")
+
+dif.PACF <- ggPacf(emp.dif)+ ggtitle("PACF of Stationary B-C Data")
+
+grid.arrange(dif.ACK, dif.PACF)
+
+####################Now we need to choose a model
 
 ###Part 2
 #In this part use the data based on the decision in point 1.2 (i.e. either the original data or the log/box-cox transformed data).
