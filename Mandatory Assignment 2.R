@@ -123,7 +123,7 @@ dif.ACF <- ggAcf(emp.dif)+ ggtitle("ACF of Stationary B-C Data")
 
 dif.PACF <- ggPacf(emp.dif)+ ggtitle("PACF of Stationary B-C Data")
 
-grid.arrange(dif.ACK, dif.PACF)
+grid.arrange(dif.ACF, dif.PACF)
 
 ####################Now we need to choose a model(Choose the best p,d,q that perform best on our data)
 
