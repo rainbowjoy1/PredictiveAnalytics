@@ -18,7 +18,8 @@ library(urca)
 
 
 #read the csv file from github repository
-emp <- read.csv("C://Study//Semester2//Predictive Analytics//Github_R//emp.csv", header=TRUE)
+#emp <- read.csv("C://Study//Semester2//Predictive Analytics//Github_R//emp.csv", header=TRUE)
+emp <- read.csv("emp.csv", header=TRUE)
 
 #convert the date column to date format
 emp[["DATE"]] <- as.Date(emp[["DATE"]])
@@ -76,8 +77,6 @@ plot.ts(bx.emp, ylab= "", main = latex2exp::TeX(paste0("Transformed EMP data wit
 #and discuss the results.
 
 
-######Maybe should change to ur.adf functions? 
-
 #'*Based on the data shown in part 1 the data is best represented by a random walk with drift.*
 #'*This means that we should use tau for a KPSS formula and trend with AIC for DF test*
 
@@ -125,10 +124,14 @@ dif.PACF <- ggPacf(emp.dif)+ ggtitle("PACF of Stationary B-C Data")
 
 grid.arrange(dif.ACF, dif.PACF)
 
+autoplot(emp.dif)
+
 ####################Now we need to choose a model(Choose the best p,d,q that perform best on our data)
 
 ###Part 2
 #In this part use the data based on the decision in point 1.2 (i.e. either the original data or the log/box-cox transformed data).
+
+bx.emp
 
 #1. Split your sample into a train set and a test set. Estimate one ARIMA model by using AIC: is the estimated model 
 #coherent with the information acquired in point 1.3? Discuss the properties of the residuals. Can the model be improved? 
