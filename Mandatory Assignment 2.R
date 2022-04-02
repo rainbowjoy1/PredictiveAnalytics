@@ -119,13 +119,13 @@ adf.test(emp.dif)
 # The adf test returned the p-value of 0.01 which is smaller than 0.05, so we can reject the null hypothesis and
 # conclude that the data is stationary.
 
-dif.ACK <- ggAcf(emp.dif)+ ggtitle("ACF of Stationary B-C Data")
+dif.ACF <- ggAcf(emp.dif)+ ggtitle("ACF of Stationary B-C Data")
 
 dif.PACF <- ggPacf(emp.dif)+ ggtitle("PACF of Stationary B-C Data")
 
 grid.arrange(dif.ACK, dif.PACF)
 
-####################Now we need to choose a model
+####################Now we need to choose a model(Choose the best p,d,q that perform best on our data)
 
 ###Part 2
 #In this part use the data based on the decision in point 1.2 (i.e. either the original data or the log/box-cox transformed data).
