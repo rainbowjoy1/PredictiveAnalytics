@@ -1,4 +1,4 @@
-#try write by Annaya
+
 ###Part 1
 #1. Plot the data and the autocorrelation function. Decompose your time series into trend, cycle,
 #and seasonal component with a methodology of your choice (classical decomposition, SEATS, etc). 
@@ -18,7 +18,7 @@ library(urca)
 
 
 #read the csv file from github repository
-emp <- read.csv("emp.csv", header=TRUE)
+emp <- read.csv("C://Study//Semester2//Predictive Analytics//Github_R//emp.csv", header=TRUE)
 
 #convert the date column to date format
 emp[["DATE"]] <- as.Date(emp[["DATE"]])
@@ -79,7 +79,7 @@ plot.ts(bx.emp, ylab= "", main = latex2exp::TeX(paste0("Transformed EMP data wit
 ######Maybe should change to ur.adf functions? 
 
 #'*Based on the data shown in part 1 the data is best represented by a random walk with drift.*
-#'*This means that we should use tau for a KPSS formua and trend with AIC for DF test*
+#'*This means that we should use tau for a KPSS formula and trend with AIC for DF test*
 
 kpss.test(bx.emp, null="Trend")
 summary(ur.kpss(bx.emp, type = c("tau")))
@@ -116,7 +116,8 @@ emp.dif <- diff(bx.emp)
 kpss.test(emp.dif, null="Trend")
 adf.test(emp.dif)
 
-
+# The adf test returned the p-value of 0.01 which is smaller than 0.05, so we can reject the null hypothesis and
+# conclude that the data is stationary.
 
 dif.ACK <- ggAcf(emp.dif)+ ggtitle("ACF of Stationary B-C Data")
 
