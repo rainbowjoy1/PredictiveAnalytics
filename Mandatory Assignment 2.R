@@ -18,7 +18,8 @@ library(urca)
 
 
 #read the csv file from github repository
-emp <- read.csv("C://Study//Semester2//Predictive Analytics//Github_R//emp.csv", header=TRUE)
+#emp <- read.csv("C://Study//Semester2//Predictive Analytics//Github_R//emp.csv", header=TRUE)
+emp <- read.csv("emp.csv", header=TRUE)
 
 #convert the date column to date format
 emp[["DATE"]] <- as.Date(emp[["DATE"]])
