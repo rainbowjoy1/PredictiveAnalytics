@@ -136,7 +136,14 @@ bx.emp
 #1. Split your sample into a train set and a test set. Estimate one ARIMA model by using AIC: is the estimated model 
 #coherent with the information acquired in point 1.3? Discuss the properties of the residuals. Can the model be improved? 
 # If it is the case, modify it discuss the new model performance.
+  
+windowl <- 144L
+train <- head(bx.emp, round(length(bx.emp) - windowl))
+test <- tail(bx.emp, windowl)
 
+#'*Split on 20% of the data*
+
+#I have no idea how to do this. I can't tell from the example. I'll try again tomorrow evening. 
 
 #2. Perform a forecast with the model selected in point 2.1 and in point 1.4 
 #(note: if you had detrended or differentiated you need to change something in the formula). Plot the forecasts
