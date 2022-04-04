@@ -15,6 +15,7 @@ library(gridExtra)
 library(latex2exp)
 library(tseries)
 library(urca)
+library(tidyverse)
 
 
 #read the csv file from github repository
@@ -126,8 +127,22 @@ grid.arrange(dif.ACF, dif.PACF)
 
 autoplot(emp.dif)
 
-####################Now we need to choose a model(Choose the best p,d,q that perform best on our data)
+####################Now we need to choose a model(Choose the best p,d,q that perform best on our data
 
+#We try out auto.arima() as an alternative model
+auto = auto.arima(emp.dif)
+auto
+
+#There are many significant lags in both ACF and PACF plots.
+#ACF and PACF have the last significant lag at lag 26. We use grid search to facilitate finding the best model for the data.
+order_list = list (seq(0,26), seq(0,26), seq(0,26)) %>% cross() %>% map(lift(c))
+orderdf = tibble("order" = order_list)
+
+models_df = orderdf %>% mutate(models = map(order, ~possibly(arima, otherwise = NULL)(x = emp.dif, order = .x))) %>% filter (models != 'NULL') %>% mutate(aic = map_dbl(models, "aic"))
+models_df
+best_models = model_df %>% filter (aic ==min(models_df$aic, na.rm = TRUE))
+View(best_models)
+type(best_models)
 ###Part 2
 #In this part use the data based on the decision in point 1.2 (i.e. either the original data or the log/box-cox transformed data).
 
