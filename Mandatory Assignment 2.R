@@ -81,7 +81,6 @@ plot.ts(bx.emp, ylab= "", main = latex2exp::TeX(paste0("Transformed EMP data wit
 #'*Based on the data shown in part 1 the data is best represented by a random walk with drift.*
 #'*This means that we should use tau for a KPSS formula and trend with AIC for DF test*
 
-kpss.test(bx.emp, null="Trend")
 summary(ur.kpss(bx.emp, type = c("tau")))
 
 ###Not sure which one to keep^
@@ -90,7 +89,6 @@ summary(ur.kpss(bx.emp, type = c("tau")))
 #'*(smaller than .05) tell us that we need to use differencing. Since our returned p-value*
 #'*is .01 we can reject the null hypothesis and determine that the data is not stationary.*
 
-adf.test(bx.emp)
 summary(ur.df(bx.emp,type="trend",selectlags = "AIC"))
 
 #'*The adf test has a null hypothesis that there is a unit root. The alternate hypothesis*
