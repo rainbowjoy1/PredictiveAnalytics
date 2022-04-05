@@ -155,6 +155,10 @@ test <- tail(bx.emp, windowl)
 
 #'*Split on 20% of the data*
 
+<<<<<<< HEAD
+test.ts <- as_tsibble(test)
+=======
+>>>>>>> 3a5b42209cdb409376c88fa5ba7f44104ea0ea29
 train.ts <- as_tsibble(train)
 
 auto.fit<- train.ts %>% model(ARIMA(value,ic = "aic", stepwise = FALSE, approx = FALSE))
@@ -173,7 +177,11 @@ gg_tsresiduals(auto.fit)
 #'*The tails are uneven and the shape is too tall. According to the residuals the model can be improved.*
 
 fit<- train.ts %>% model(auto = ARIMA(value, ic = "aic", stepwise = FALSE, approx = FALSE), 
+<<<<<<< HEAD
+                         arima211001 = ARIMA(value ~pdq(2,1,1) + PDQ(0,0,1)), 
+=======
                          arima201001 = ARIMA(value ~pdq(2,1,1) + PDQ(0,0,1)), 
+>>>>>>> 3a5b42209cdb409376c88fa5ba7f44104ea0ea29
                          arima101202 = ARIMA(value ~pdq(2,1,1) + PDQ(2,1,2)))
 
 fit %>% pivot_longer(everything(), names_to = "Model Name", values_to = "Orders")
@@ -185,3 +193,16 @@ glance(fit) %>% arrange(AICc) %>% select(.model:BIC)
 #(note: if you had detrended or differentiated you need to change something in the formula). Plot the forecasts
 #of each model with the original data in two separate graphs and discuss the measures of
 #accuracy: what is the best model?
+
+forecast(fit, h=144) %>% filter(.model=='auto') %>% autoplot(train.ts)+ autoplot(test.ts)
+
+autoplot(emp.ts)
+autoplot(test.ts)
+
+#the auto has a larger 
+
+forecast(fit, h=144) %>% filter(.model=='arima211001') %>%
+  autoplot(train.ts)
+#This data is still diffed and BoxCoxed and I don't know how to undo it.
+#any thoughts team?
+
