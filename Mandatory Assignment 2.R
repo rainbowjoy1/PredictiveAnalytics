@@ -19,8 +19,8 @@ library(tidyverse)
 
 
 #read the csv file from github repository
-emp <- read.csv("C://Study//Semester2//Predictive Analytics//Github_R//emp.csv", header=TRUE)
-#emp <- read.csv("emp.csv", header=TRUE)
+#emp <- read.csv("C://Study//Semester2//Predictive Analytics//Github_R//emp.csv", header=TRUE)
+emp <- read.csv("emp.csv", header=TRUE)
 emp
 #convert the date column to date format
 emp[["DATE"]] <- as.Date(emp[["DATE"]])
@@ -151,6 +151,7 @@ auto
 
 #There are many significant spikes in both ACF and PACF plots.
 #PACF has the last significant lag at lag 26. We use grid search to facilitate finding the best model for the data.
+
 order_list = list (seq(0,3), seq(0,3), seq(0,3)) %>% cross() %>% map(lift(c))
 order_list
 orderdf = tibble("order" = order_list)
@@ -176,9 +177,47 @@ test <- tail(bx.emp, windowl)
 
 #'*Split on 20% of the data*
 
-#I have no idea how to do this. I can't tell from the example. I'll try again tomorrow evening. 
+test.ts <- as_tsibble(test)
+train.ts <- as_tsibble(train)
+
+auto.fit<- train.ts %>% model(ARIMA(value,ic = "aic", stepwise = FALSE, approx = FALSE))
+
+auto.fit
+
+#'*We believe that the auto ARIMA using AIC is improperly fitting a model because the d of non-*
+#'*seasonal component is returning 2 but when we ran the ndiffs and KPSS we found that 1 dif was the most*
+#'*appropriate for our data set.We allso ran an additional diff and found that our data was overdifferentiated*
+
+
+gg_tsresiduals(auto.fit)
+
+#'*Our residual plot shows that the data does not have a zero mean. The plot has spikes*
+#'*up to 4,000. The acf has 2 significant spikes, and the distribution is not normal.*
+#'*The tails are uneven and the shape is too tall. According to the residuals the model can be improved.*
+
+fit<- train.ts %>% model(auto = ARIMA(value, ic = "aic", stepwise = FALSE, approx = FALSE), 
+                         arima211001 = ARIMA(value ~pdq(2,1,1) + PDQ(0,0,1)), 
+                         arima101202 = ARIMA(value ~pdq(2,1,1) + PDQ(2,1,2)))
+
+fit %>% pivot_longer(everything(), names_to = "Model Name", values_to = "Orders")
+
+glance(fit) %>% arrange(AICc) %>% select(.model:BIC)
+
 
 #2. Perform a forecast with the model selected in point 2.1 and in point 1.4 
 #(note: if you had detrended or differentiated you need to change something in the formula). Plot the forecasts
 #of each model with the original data in two separate graphs and discuss the measures of
 #accuracy: what is the best model?
+
+forecast(fit, h=144) %>% filter(.model=='auto') %>% autoplot(train.ts)+ autoplot(test.ts)
+
+autoplot(emp.ts)
+autoplot(test.ts)
+
+#the auto has a larger 
+
+forecast(fit, h=144) %>% filter(.model=='arima211001') %>%
+  autoplot(train.ts)
+#This data is still diffed and BoxCoxed and I don't know how to undo it.
+#any thoughts team?
+
