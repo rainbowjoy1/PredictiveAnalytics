@@ -136,7 +136,7 @@ auto
 #Try following the book
 # There is a significant spike at lag 2 in the ACF, which suggest a non-seasonal  MA(2) component. 
 # The significant spike at lag 24 suggests a seasonal MA(2). unitroot_ndiffs() suggests 1 time difference for d and D
-# Note: we have arima(p,1,1)(P,1,2) right now. We are missing p and P for our guess.
+# Note: we have arima(p,1,2)(P,1,2) right now. We are missing p and P for our guess.
 
 #There are many significant spikes in both ACF and PACF plots.
 #PACF has the last significant lag at lag 26. We use grid search to facilitate finding the best model for the data.
