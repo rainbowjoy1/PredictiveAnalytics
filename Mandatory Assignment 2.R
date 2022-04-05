@@ -135,12 +135,15 @@ auto
 # There is a significant spike at lag 2 in the ACF, which suggest a non-seasonal  MA(2) component. 
 # The significant spike at lag 24 suggests a seasonal MA(2). 
 
+# We have a lot of significant spikes in our ACF and PACF. We have implemented second differencing to the data 
+# but it turned out that we have over-differencing. So, we chose to apply differencing 1 time.
 # The unitroot_ndiffs() suggests 1 time difference for d and D. However, we have differenced our data 1 time, so we choose d as 0.
 # We eximine ACF and PACF of the stationary dataset. we can see that there is no exponential decay nor sinusoidal behavior.
 # We know that p and q are not both zero because our ACF and PACF do not show white noise. 
 # We have the most significant lag is at lag 2 in ACF. So, we determine that p is 2.  
 # We determine q as 1 because the first significant lag is negative and at lag 1.
-# Note: we have arima(2,0,2)(P,D,2) right now. We are missing p and P for our guess.
+
+# Note: we have arima(2,0,1)(P,D,Q) right now. We are missing p and P for our guess.
 
 #There are many significant spikes in both ACF and PACF plots.
 #PACF has the last significant lag at lag 26. We use grid search to facilitate finding the best model for the data.
