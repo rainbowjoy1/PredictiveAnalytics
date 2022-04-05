@@ -10,8 +10,8 @@ library(ggfortify)
 library(forecast)
 library(dplyr)
 library(fpp3)
-#library(tsibble)
-#library(gridExtra)
+library(tsibble)
+library(gridExtra)
 library(latex2exp)
 library(tseries)
 library(urca)
@@ -19,8 +19,8 @@ library(tidyverse)
 
 
 #read the csv file from github repository
-#emp <- read.csv("C://Study//Semester2//Predictive Analytics//Github_R//emp.csv", header=TRUE)
-emp <- read.csv("emp.csv", header=TRUE)
+emp <- read.csv("C://Study//Semester2//Predictive Analytics//Github_R//emp.csv", header=TRUE)
+#emp <- read.csv("emp.csv", header=TRUE)
 emp
 #convert the date column to date format
 emp[["DATE"]] <- as.Date(emp[["DATE"]])
@@ -133,18 +133,20 @@ autoplot(emp.dif)
 auto = auto.arima(emp.dif)
 auto
 
-#There are many significant lags in both ACF and PACF plots.
-#ACF and PACF have the last significant lag at lag 26. We use grid search to facilitate finding the best model for the data.
-order_list = list (seq(0,26), seq(0,26), seq(0,26)) %>% cross() %>% map(lift(c))
+#Try following the book
+# There is a significant spike at lag 2 in the ACF, which suggest a non-seasonal  MA(2) component. 
+# The significant spike at lag 24 suggests a seasonal MA(2). KPSS test suggests 1 time differencing for the non-seasonality component.
+
+#There are many significant spikes in both ACF and PACF plots.
+#PACF has the last significant lag at lag 26. We use grid search to facilitate finding the best model for the data.
+order_list = list (seq(0,3), seq(0,3), seq(0,3)) %>% cross() %>% map(lift(c))
 orderdf = tibble("order" = order_list)
 
 models_df = orderdf %>% mutate(models = map(order, ~possibly(arima, otherwise = NULL)(x = emp.dif, order = .x))) %>% filter (models != 'NULL') %>% mutate(aic = map_dbl(models, "aic"))
 models_df
-best_models = model_df %>% filter(aic ==min(models_df$aic, na.rm = TRUE))
-typeof(best_models)
-best_models %>% print(n=1)
+best_models = models_df %>% filter(aic ==min(models_df$aic, na.rm = TRUE))
 View(best_models)
-head(best_models)
+#not the best method yet. Grid search takes so much time when we run up to 26! Also, this one only work with non-seasonal components.
 
 ###Part 2
 #In this part use the data based on the decision in point 1.2 (i.e. either the original data or the log/box-cox transformed data).
