@@ -10,8 +10,8 @@ library(ggfortify)
 library(forecast)
 library(dplyr)
 library(fpp3)
-library(tsibble)
-library(gridExtra)
+#library(tsibble)
+#library(gridExtra)
 library(latex2exp)
 library(tseries)
 library(urca)
@@ -21,7 +21,7 @@ library(tidyverse)
 #read the csv file from github repository
 #emp <- read.csv("C://Study//Semester2//Predictive Analytics//Github_R//emp.csv", header=TRUE)
 emp <- read.csv("emp.csv", header=TRUE)
-
+emp
 #convert the date column to date format
 emp[["DATE"]] <- as.Date(emp[["DATE"]])
 
@@ -140,9 +140,12 @@ orderdf = tibble("order" = order_list)
 
 models_df = orderdf %>% mutate(models = map(order, ~possibly(arima, otherwise = NULL)(x = emp.dif, order = .x))) %>% filter (models != 'NULL') %>% mutate(aic = map_dbl(models, "aic"))
 models_df
-best_models = model_df %>% filter (aic ==min(models_df$aic, na.rm = TRUE))
+best_models = model_df %>% filter(aic ==min(models_df$aic, na.rm = TRUE))
+typeof(best_models)
+best_models %>% print(n=1)
 View(best_models)
-type(best_models)
+head(best_models)
+
 ###Part 2
 #In this part use the data based on the decision in point 1.2 (i.e. either the original data or the log/box-cox transformed data).
 
