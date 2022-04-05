@@ -137,11 +137,15 @@ auto
 
 # We have a lot of significant spikes in our ACF and PACF. We have implemented second differencing to the data 
 # but it turned out that we have over-differencing. So, we chose to apply differencing 1 time.
-# The unitroot_ndiffs() suggests 1 time difference for d and D. However, we have differenced our data 1 time, so we choose d as 0.
-# We eximine ACF and PACF of the stationary dataset. we can see that there is no exponential decay nor sinusoidal behavior.
+# As,wellas, The unitroot_ndiffs() suggests 1 time difference for d and D. However, we have differenced our data 1 time, so we choose d as 0.
+# We examine ACF and PACF of the stationary data. we can see that there is no exponential decay nor sinusoidal behavior.
 # We know that p and q are not both zero because our ACF and PACF do not show white noise. 
-# We have the most significant lag is at lag 2 in ACF. So, we determine that p is 2.  
-# We determine q as 1 because the first significant lag is negative and at lag 1.
+# We have the most significant lag at lag 2 in ACF. So, we determine that p is 2.  
+# We identify significant lag at lag 12 and 24. We determine that we need a seasonal component of ARIMA model as well.
+# The autocorrelation function(ACF) of the difference data shows a sharp cut off and lag 1 autocorrelation is negative and
+# the series appeared to be over-differenced. We added MA term to the model. 
+
+# We determine q as 1 because the first significant lag is negative and at lag 1, as well as we can see the
 
 # Note: we have arima(2,0,1)(P,D,Q) right now. We are missing p and P for our guess.
 
