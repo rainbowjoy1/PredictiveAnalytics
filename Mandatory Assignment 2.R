@@ -29,9 +29,8 @@ emp[["DATE"]] <- as.Date(emp[["DATE"]])
 dim(emp)
 summary(emp)
 
-#convert the data to a time series to allow the SCF to run an dplace the data in monthly format
+#convert the data to a time series to allow the SCF to run and place the data in monthly format
 emp.ts <- ts(emp[,2], start = c(1948,1), end = c(2007,12), frequency = 12)
-
 
 #generate plots of the data
 auto <- autoplot(emp.ts)+ ylab("")+ggtitle("Plot of Time Series Data")
@@ -131,10 +130,6 @@ autoplot(emp.dif)
 auto = auto.arima(emp.dif)
 auto
 
-#Try following the book
-# There is a significant spike at lag 2 in the ACF, which suggest a non-seasonal  MA(2) component. 
-# The significant spike at lag 24 suggests a seasonal MA(2). 
-
 # We have a lot of significant spikes in our ACF and PACF. We have implemented second differencing to the data 
 # but it turned out that we have over-differencing. So, we chose to apply differencing 1 time.
 # As,wellas, The unitroot_ndiffs() suggests 1 time difference for d and D. However, we have differenced our data 1 time, so we choose d as 0.
@@ -144,23 +139,6 @@ auto
 # We identify significant lag at lag 12 and 24. We determine that we need a seasonal component of ARIMA model as well.
 # The autocorrelation function(ACF) of the difference data shows a sharp cut off and lag 1 autocorrelation is negative and
 # the series appeared to be over-differenced. We added MA term to the model. 
-
-# We determine q as 1 because the first significant lag is negative and at lag 1, as well as we can see the
-
-# Note: we have arima(2,0,1)(P,D,Q) right now. We are missing p and P for our guess.
-
-#There are many significant spikes in both ACF and PACF plots.
-#PACF has the last significant lag at lag 26. We use grid search to facilitate finding the best model for the data.
-
-order_list = list (seq(0,3), seq(0,3), seq(0,3)) %>% cross() %>% map(lift(c))
-order_list
-orderdf = tibble("order" = order_list)
-
-models_df = orderdf %>% mutate(models = map(order, ~possibly(arima, otherwise = NULL)(x = emp.dif, order = .x))) %>% filter (models != 'NULL') %>% mutate(aic = map_dbl(models, "aic"))
-models_df
-best_models = models_df %>% filter(aic ==min(models_df$aic, na.rm = TRUE))
-View(best_models)
-#not the best method yet. Grid search takes so much time when we run up to 26! Also, this one only work with non-seasonal components.
 
 ###Part 2
 #In this part use the data based on the decision in point 1.2 (i.e. either the original data or the log/box-cox transformed data).
