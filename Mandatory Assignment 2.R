@@ -150,13 +150,18 @@ bx.emp
 # If it is the case, modify it discuss the new model performance.
 
 #'*Split on 20% of the data*  
+#windowl <- 144L
+#train <- head(bx.emp, round(length(bx.emp) - windowl))
+#test <- tail(bx.emp, windowl)
+#test.ts <- as_tsibble(test)
+#train.ts <- as_tsibble(train)
 windowl <- 144L
-train <- head(bx.emp, round(length(bx.emp) - windowl))
-test <- tail(bx.emp, windowl)
-test.ts <- as_tsibble(test)
-train.ts <- as_tsibble(train)
+train_emp <- head(emp.ts, round(length(emp) - windowl))
+test_emp <- tail(emp.ts, windowl)
+test_emp.ts <- as_tsibble(test_emp)
+train_emp.ts <- as_tsibble(train_emp)
 
-auto.fit<- train.ts %>% model(ARIMA(value,ic = "aic", stepwise = FALSE, approx = FALSE))
+auto.fit<- train_emp.ts %>% model(ARIMA(value,ic = "aic", stepwise = FALSE, approx = FALSE))
 auto.fit
 gg_tsresiduals(auto.fit)
 
@@ -167,7 +172,7 @@ gg_tsresiduals(auto.fit)
 #'*up to 4,000. The acf has 2 significant spikes, and the distribution is not normal.*
 #'*The tails are uneven and the shape is too tall. According to the residuals the model can be improved.*
 
-fit<- train.ts %>% model(auto121202 = ARIMA(value, ic = "aic", stepwise = FALSE, approx = FALSE), 
+fit<- train_emp.ts %>% model(auto121202 = ARIMA(value, ic = "aic", stepwise = FALSE, approx = FALSE), 
 
                          arima211001 = ARIMA(value ~ 0 + pdq(2,1,1) + PDQ(0,0,1)),
                          
@@ -185,17 +190,21 @@ glance(fit) %>% arrange(AICc) %>% select(.model:BIC)
 #of each model with the original data in two separate graphs and discuss the measures of
 #accuracy: what is the best model?
 auto_fc <- forecast(fit, h=144) %>% filter(.model=='auto121202')
-auto_fc_plot <- auto_fc %>% autoplot(train.ts) +ggtitle("Plot of Auto ARIMA forecast")
+auto_fc_plot <- auto_fc %>% autoplot(train_emp.ts) +ggtitle("Plot of the Auto ARIMA's forecast")
 
 #autoplot(emp.ts)
 #autoplot(test.ts)
 
 #the auto has a larger 
-our_fc <- forecast(fit, h=144) %>% filter(.model=='arima212012')
-our_fc_plot <- our_fc %>% autoplot(train.ts) +ggtitle("Plot of the selected model forecast")
-
-grid.arrange(our_fc_plot, auto_fc_plot)
 #This data is still diffed and BoxCoxed and I don't know how to undo it.
 #any thoughts team?
-accuracy(auto_fc, test.ts)
-accuracy(our_fc, test.ts)
+
+
+
+our_fc <- forecast(fit, h=144) %>% filter(.model=='arima212012')
+our_fc_plot <- our_fc %>% autoplot(train_emp.ts) +ggtitle("Plot of the selected model's forecast")
+
+grid.arrange(our_fc_plot, auto_fc_plot)
+
+accuracy(auto_fc, test_emp.ts)
+accuracy(our_fc, test_emp.ts)
