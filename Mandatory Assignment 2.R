@@ -148,17 +148,16 @@ bx.emp
 #1. Split your sample into a train set and a test set. Estimate one ARIMA model by using AIC: is the estimated model 
 #coherent with the information acquired in point 1.3? Discuss the properties of the residuals. Can the model be improved? 
 # If it is the case, modify it discuss the new model performance.
-  
+
+#'*Split on 20% of the data*  
 windowl <- 144L
 train <- head(bx.emp, round(length(bx.emp) - windowl))
 test <- tail(bx.emp, windowl)
-
-#'*Split on 20% of the data*
-
 test.ts <- as_tsibble(test)
 train.ts <- as_tsibble(train)
 
 auto.fit<- train.ts %>% model(ARIMA(value,ic = "aic", stepwise = FALSE, approx = FALSE))
+auto.fit
 gg_tsresiduals(auto.fit)
 
 #'*We believe that the auto ARIMA using AIC is improperly fitting a model because the d of non-*
@@ -168,13 +167,13 @@ gg_tsresiduals(auto.fit)
 #'*up to 4,000. The acf has 2 significant spikes, and the distribution is not normal.*
 #'*The tails are uneven and the shape is too tall. According to the residuals the model can be improved.*
 
-fit<- train.ts %>% model(auto = ARIMA(value, ic = "aic", stepwise = FALSE, approx = FALSE), 
-<<<<<<< HEAD
-                         arima211001 = ARIMA(value ~pdq(2,1,1) + PDQ(0,0,1)), 
-=======
-                         arima201001 = ARIMA(value ~pdq(2,1,1) + PDQ(0,0,1)), 
->>>>>>> 3a5b42209cdb409376c88fa5ba7f44104ea0ea29
-                         arima101202 = ARIMA(value ~pdq(2,1,1) + PDQ(2,1,2)))
+fit<- train.ts %>% model(auto311200 = ARIMA(value, ic = "aic", stepwise = FALSE, approx = FALSE), 
+
+                         arima211001 = ARIMA(value ~ 1 + pdq(2,1,1) + PDQ(0,0,1)),
+                         
+                         arima212012 = ARIMA(value ~ 1 + pdq(2,1,2) + PDQ(0,1,2)),
+
+                         arima211202 = ARIMA(value ~ 1 + pdq(2,1,1) + PDQ(2,0,2)))
 
 fit %>% pivot_longer(everything(), names_to = "Model Name", values_to = "Orders")
 
