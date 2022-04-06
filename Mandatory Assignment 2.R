@@ -87,12 +87,11 @@ summary(ur.kpss(bx.emp, type = c("tau")))
 #'*(smaller than .05) tell us that we need to use differencing. Since our returned p-value*
 #'*is .01 we can reject the null hypothesis and determine that the data is not stationary.*
 
-#summary(ur.df(bx.emp,type="trend",selectlags = "AIC"))
 adf.test(bx.emp)
 
 #'*The adf test has a null hypothesis that there is a unit root. The alternate hypothesis*
-#'*says that the time series is stationary. The ADF test returned a p-value of .3226 because*
-#'*it is not less than .05 we fail to reject the null hypothesis and conclude that our data is non-stationary*
+#'*says that the time series is stationary. The ADF test returned a p-value of .3226 which is*
+#'*is not less than .05 we fail to reject the null hypothesis and conclude that our data is non-stationary*
 
 #4. If the series is not stationary, follow the approach presented in class to make it stationary.
 #When the series is stationary, look at the autocorrelation and partial autocorrelation function,
