@@ -156,7 +156,7 @@ bx.emp
 #test.ts <- as_tsibble(test)
 #train.ts <- as_tsibble(train)
 windowl <- 144L
-train_emp <- head(emp.ts, round(length(emp) - windowl))
+train_emp <- head(emp.ts, round(length(emp.ts) - windowl))
 test_emp <- tail(emp.ts, windowl)
 test_emp.ts <- as_tsibble(test_emp)
 train_emp.ts <- as_tsibble(train_emp)
@@ -208,3 +208,4 @@ grid.arrange(our_fc_plot, auto_fc_plot)
 
 accuracy(auto_fc, test_emp.ts)
 accuracy(our_fc, test_emp.ts)
+
