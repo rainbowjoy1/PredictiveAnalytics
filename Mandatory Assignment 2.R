@@ -19,8 +19,8 @@ library(tidyverse)
 
 
 #read the csv file from github repository
-#emp <- read.csv("C://Study//Semester2//Predictive Analytics//Github_R//emp.csv", header=TRUE)
-emp <- read.csv("emp.csv", header=TRUE)
+emp <- read.csv("C://Study//Semester2//Predictive Analytics//Github_R//emp.csv", header=TRUE)
+#emp <- read.csv("emp.csv", header=TRUE)
 emp
 #convert the date column to date format
 emp[["DATE"]] <- as.Date(emp[["DATE"]])
@@ -50,7 +50,7 @@ autoplot(decompose(emp.ts, type = c("multiplicative")))+
 #'*Our decomposition shows that there is a strong trend in the data. It also shows that there is* 
 #'*strong seasonality and some cycles. It is important to note that we used classical multiplicative decomposition*
 #'*Which assumes that there is a seasonal component and that it is constant from year to year so it is possible*
-#'*that the seasonal element is overtstated*
+#'*that the seasonal element is overstated*
 #'
 #'*A more accurate, but more time consuming, method would be to take the data and use STL*
 #'*but we would have to run the Guerrero feature to determine the lambda so we can run a Box-Cox transformation*
@@ -82,13 +82,13 @@ plot.ts(bx.emp, ylab= "", main = latex2exp::TeX(paste0("Transformed EMP data wit
 
 summary(ur.kpss(bx.emp, type = c("tau")))
 
-###Not sure which one to keep^
 
-#'*In this test our null hypothesis is that the data is stationary. So small p-values*
+#'*In this test, our null hypothesis is that the data is stationary. So small p-values*
 #'*(smaller than .05) tell us that we need to use differencing. Since our returned p-value*
 #'*is .01 we can reject the null hypothesis and determine that the data is not stationary.*
 
-summary(ur.df(bx.emp,type="trend",selectlags = "AIC"))
+#summary(ur.df(bx.emp,type="trend",selectlags = "AIC"))
+adf.test(bx.emp)
 
 #'*The adf test has a null hypothesis that there is a unit root. The alternate hypothesis*
 #'*says that the time series is stationary. The ADF test returned a p-value of .3226 because*
