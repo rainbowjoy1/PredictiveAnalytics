@@ -130,15 +130,15 @@ autoplot(emp.dif)
 auto = auto.arima(emp.dif)
 auto
 
-# We have a lot of significant spikes in our ACF and PACF. We have implemented second differencing to the data 
-# but it turned out that we have over-differencing. So, we chose to apply differencing 1 time.
-# As,wellas, The unitroot_ndiffs() suggests 1 time difference for d and D. However, we have differenced our data 1 time, so we choose d as 0.
-# We examine ACF and PACF of the stationary data. we can see that there is no exponential decay nor sinusoidal behavior.
-# We know that p and q are not both zero because our ACF and PACF do not show white noise. 
-# We have the most significant lag at lag 2 in ACF. So, we determine that p is 2.  
-# We identify significant lag at lag 12 and 24. We determine that we need a seasonal component of ARIMA model as well.
-# The autocorrelation function(ACF) of the difference data shows a sharp cut off and lag 1 autocorrelation is negative and
-# the series appeared to be over-differenced. We added MA term to the model. 
+#'*We have a lot of significant spikes in our ACF and PACF. We have implemented second differencing to the data*
+#'*but it turned out that we have over-differencing. So, we chose to apply differencing 1 time.*
+#'*As,well as, The unitroot_ndiffs() suggests 1 time difference for d and D. However, we have differenced our data 1 time, so we choose d as 0.*
+#'*We examine ACF and PACF of the stationary data. we can see that there is no exponential decay nor sinusoidal behavior.*
+#'*We know that p and q are not both zero because our ACF and PACF do not show white noise.* 
+#'*We have the most significant lag at lag 2 in ACF. So, we determine that p is 2.* 
+#'*We identify significant lag at lag 12 and 24. We determine that we need a seasonal component of ARIMA model as well.*
+#'*The ACF plot shows a sharp cut off and the lag 1 of ACF is negative. So, we determine that q is 1.*
+ 
 
 ###Part 2
 #In this part use the data based on the decision in point 1.2 (i.e. either the original data or the log/box-cox transformed data).
@@ -155,23 +155,15 @@ test <- tail(bx.emp, windowl)
 
 #'*Split on 20% of the data*
 
-<<<<<<< HEAD
 test.ts <- as_tsibble(test)
-=======
->>>>>>> 3a5b42209cdb409376c88fa5ba7f44104ea0ea29
 train.ts <- as_tsibble(train)
 
 auto.fit<- train.ts %>% model(ARIMA(value,ic = "aic", stepwise = FALSE, approx = FALSE))
-
-auto.fit
+gg_tsresiduals(auto.fit)
 
 #'*We believe that the auto ARIMA using AIC is improperly fitting a model because the d of non-*
 #'*seasonal component is returning 2 but when we ran the ndiffs and KPSS we found that 1 dif was the most*
 #'*appropriate for our data set.We allso ran an additional diff and found that our data was overdifferentiated*
-
-
-gg_tsresiduals(auto.fit)
-
 #'*Our residual plot shows that the data does not have a zero mean. The plot has spikes*
 #'*up to 4,000. The acf has 2 significant spikes, and the distribution is not normal.*
 #'*The tails are uneven and the shape is too tall. According to the residuals the model can be improved.*
