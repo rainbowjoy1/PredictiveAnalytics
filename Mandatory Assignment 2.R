@@ -171,7 +171,7 @@ fit<- train.ts %>% model(auto311200 = ARIMA(value, ic = "aic", stepwise = FALSE,
 
                          arima211001 = ARIMA(value ~ 1 + pdq(2,1,1) + PDQ(0,0,1)),
                          
-                         arima212012 = ARIMA(value ~ 1 + pdq(2,1,2) + PDQ(0,1,2)),
+                         arima212012 = ARIMA(value ~ 0 + pdq(2,1,2) + PDQ(0,1,2)),
 
                          arima211202 = ARIMA(value ~ 1 + pdq(2,1,1) + PDQ(2,0,2)))
 
