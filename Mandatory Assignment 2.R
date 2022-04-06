@@ -167,13 +167,13 @@ gg_tsresiduals(auto.fit)
 #'*up to 4,000. The acf has 2 significant spikes, and the distribution is not normal.*
 #'*The tails are uneven and the shape is too tall. According to the residuals the model can be improved.*
 
-fit<- train.ts %>% model(auto311200 = ARIMA(value, ic = "aic", stepwise = FALSE, approx = FALSE), 
+fit<- train.ts %>% model(auto121202 = ARIMA(value, ic = "aic", stepwise = FALSE, approx = FALSE), 
 
-                         arima211001 = ARIMA(value ~ 1 + pdq(2,1,1) + PDQ(0,0,1)),
+                         arima211001 = ARIMA(value ~ 0 + pdq(2,1,1) + PDQ(0,0,1)),
                          
                          arima212012 = ARIMA(value ~ 0 + pdq(2,1,2) + PDQ(0,1,2)),
 
-                         arima211202 = ARIMA(value ~ 1 + pdq(2,1,1) + PDQ(2,0,2)))
+                         arima211202 = ARIMA(value ~ 0 + pdq(2,1,1) + PDQ(2,0,2)))
 
 fit %>% pivot_longer(everything(), names_to = "Model Name", values_to = "Orders")
 
