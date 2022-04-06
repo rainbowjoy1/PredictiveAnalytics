@@ -184,16 +184,18 @@ glance(fit) %>% arrange(AICc) %>% select(.model:BIC)
 #(note: if you had detrended or differentiated you need to change something in the formula). Plot the forecasts
 #of each model with the original data in two separate graphs and discuss the measures of
 #accuracy: what is the best model?
+auto_fc <- forecast(fit, h=144) %>% filter(.model=='auto121202')
+auto_fc_plot <- auto_fc %>% autoplot(train.ts) +ggtitle("Plot of Auto ARIMA forecast")
 
-forecast(fit, h=144) %>% filter(.model=='auto') %>% autoplot(train.ts)+ autoplot(test.ts)
-
-autoplot(emp.ts)
-autoplot(test.ts)
+#autoplot(emp.ts)
+#autoplot(test.ts)
 
 #the auto has a larger 
+our_fc <- forecast(fit, h=144) %>% filter(.model=='arima212012')
+our_fc_plot <- our_fc %>% autoplot(train.ts) +ggtitle("Plot of the selected model forecast")
 
-forecast(fit, h=144) %>% filter(.model=='arima211001') %>%
-  autoplot(train.ts)
+grid.arrange(our_fc_plot, auto_fc_plot)
 #This data is still diffed and BoxCoxed and I don't know how to undo it.
 #any thoughts team?
-
+accuracy(auto_fc, test.ts)
+accuracy(our_fc, test.ts)
