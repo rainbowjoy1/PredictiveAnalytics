@@ -1,8 +1,20 @@
+library(AER)
+library(ggplot2)
+library(tsibble)
+library(fpp3)
+
+data("USMacroG")
+
+GDP_i<-USMacroG[,c("gdp", "cpi")]
+
+GDP_i
+
 #####Part 1
 
 #1. Plot GDP logs and Inflation. Investigate graphically the presence of a trend
 #and seasonality without using Classical Decomposition, STL or other statistical methodologies.
-
+log.GDP_i <- box_cox(GDP_i, 0)
+ggplot(log.GCP_i)
 
 #2. Stationarize GDP logs and Inflation.
 
