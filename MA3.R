@@ -11,9 +11,12 @@
 #logs explains (stationary) Inflation. Verify the presence of structural breaks in this regression
 #model with a QLR test and the SIS by setting the p-value to 5%.
 
+
 #####Part 2
+
 #1. Shorten the time series if structural breaks are present. Then, split the sample in a test test
 #and a training set.
+
 
 #2. Estimate a VAR and the dynamic regression (as before, GDP enters only contemporaneously 
 #as explanatory variable in the regression model) on the training set. Evaluate the fitting of the
@@ -22,5 +25,6 @@
 
 #3. Forecast the test set with the two models (hint: use an ARIMA to forecast GDP 
 #in the dynamic regression). Compare the accuracy of the two forecast for CPI.
+
 
 #4. Verify that GDP growth granger-causes inflation growth.
