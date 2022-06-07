@@ -70,28 +70,29 @@ adf.test()
 
 #Train/Test Split
 #Will split out 2022
-
+windowl <- 8L
+train_df <- head(df, round(length(df) - windowl))
+test_df <- tail(df, windowl)
+test_df.ts <- as_tsibble(test_df)
+train_df.ts <- as_tsibble(train_df)
 
 #Benchmarking Methods
 
 # Fit the models
-google_fit <- google_2015 %>%
+ fit_df<- train_df.ts %>%
   model(
-    Mean = MEAN(Close),
-    `Naïve` = NAIVE(Close),
-    Drift = NAIVE(Close ~ drift())
+    Mean = MEAN(value),
+    `Naïve` = NAIVE(value),
+    Drift = NAIVE(value ~ drift()),
+    SNAIVE(value ~ lag("year"))
   )
-# Produce forecasts for the trading days in January 2016
-google_jan_2016 <- google_stock %>%
-  filter(yearmonth(Date) == yearmonth("2016 Jan"))
-google_fc <- google_fit %>%
-  forecast(new_data = google_jan_2016)
-# Plot the forecasts
-google_fc %>%
-  autoplot(google_2015, level = NULL) +
-  autolayer(google_jan_2016, Close, colour = "black") +
-  labs(y = "$US",
-       title = "Google daily closing stock prices",
-       subtitle = "(Jan 2015 - Jan 2016)") +
-  guides(colour = guide_legend(title = "Forecast"))
+ # Produce forecasts for the trading days in January 2016
+df_fc <- fit_df %>% forecast(h=8)
 
+df_fc %>%
+  autoplot(df, level = NULL) +
+  labs(
+    y = "IAS Observations",
+    title = "Baseline Forecasts for IAS Bird Observations"
+  ) +
+  guides(colour = guide_legend(title = "Forecast"))
