@@ -15,7 +15,7 @@ library(tidyverse)
 Goose
 
 #Time series data
-goose.ts <- ts(Goose$Duck, start = c(2018,1), end = c(2022,5), frequency = 12)
+goose.ts <- ts(Goose$Duck, start = c(2015,1), end = c(2022,5), frequency = 12)
 
 #tsibble transformation
 df <-as_tsibble(goose.ts)
