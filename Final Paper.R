@@ -15,7 +15,7 @@ library(tidyverse)
 Goose
 
 #Time series data
-goose.ts <- ts(Goose$Duck, start = c(2018,1), end = c(2022,5), frequency = 12)
+goose.ts <- ts(Goose$Duck, start = c(2015,1), end = c(2022,5), frequency = 12)
 
 #tsibble transformation
 df <-as_tsibble(goose.ts)
@@ -64,8 +64,8 @@ df %>%
 bx_df <- df %>% mutate(box_cox = box_cox(value, lambda))
 
 #KPSS and ADF for testing diffs on the BCed data
-summary(ur.kpss(bx_df %>% select(box_cox) %>% as.ts(), type = "tau"))
-adf.test()
+summary(ur.kpss(bx_df %>% select(box_cox) %>% as.ts(), type = "mu"))
+summary(ur.df(bx_df%>%select(box_cox)%>%as.ts(),type="trend",selectlags = "AIC", lags = 12))
 
 
 #Train/Test Split
@@ -84,7 +84,7 @@ train_df.ts <- as_tsibble(train_df)
     Mean = MEAN(value),
     `Naïve` = NAIVE(value),
     Drift = NAIVE(value ~ drift()),
-    SNAIVE(value ~ lag("year"))
+    `Seasonal Naive` = SNAIVE(value ~ lag("year"))
   )
  # Produce forecasts for the trading days in January 2016
 df_fc <- fit_df %>% forecast(h=8)
@@ -96,3 +96,25 @@ df_fc %>%
     title = "Baseline Forecasts for IAS Bird Observations"
   ) +
   guides(colour = guide_legend(title = "Forecast"))
+
+
+
+#Determingin differencing for ARIMA
+bx_df %>%
+  transmute(
+    `Observations` = value,
+    `Box-Cox Observations` = box_cox,
+    `Seasonally Diffed Box-Cox` = difference(box_cox, 12)
+    ) %>%
+  pivot_longer(-index, names_to="Type", values_to="Sales") %>%
+  mutate(
+    Type = factor(Type, levels = c(
+      "Observations",
+      "Box-Cox Observations",
+      "Seasonally Diffed Box-Cox"))
+    ) %>%
+  ggplot(aes(x = index, y = Sales)) +
+  geom_line() +
+  facet_grid(vars(Type), scales = "free_y") +
+  labs(title = "Stationarity in IAS Data", y = NULL)
+  
