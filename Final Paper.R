@@ -9,7 +9,11 @@ library(latex2exp)
 library(tseries)
 library(urca)
 library(tidyverse)
+library(readr)
 
+Goose <- read_delim("Goose.csv", delim = ";", 
+                    escape_double = FALSE, col_types = cols(Year = col_date(format = "%d/%m/%Y")), 
+                    trim_ws = TRUE)
 
 #read the csv file from github repository
 Goose
@@ -29,8 +33,13 @@ auto <- autoplot(df)+
   labs(y = "Number of Observations",
        title = "Bird IAS in Denmark")
 
+auto
+
 #acf of the data
-acfplot <- ggAcf(df)+ ggtitle("ACF of Data")
+acfplot <- ggAcf(df, 12)+ ggtitle("ACF of Data")
+pacfplot <- ggPacf(df)+ ggtitle("PACF of Data")
+acfplot
+pacfplot
 
 #seasonal plot of data
 df %>%
@@ -59,18 +68,15 @@ lambda <- df %>%
 df %>%
   autoplot(box_cox(value, lambda))+
   labs(y = "",
-       title = "Box-Cox Transformation with Lambda= 0.7029993")
+       title = "Box-Cox Transformation with Lambda= -0.06884258")
 
 bx_df <- df %>% mutate(box_cox = box_cox(value, lambda))
 
-#KPSS and ADF for testing diffs on the BCed data
-summary(ur.kpss(bx_df %>% select(box_cox) %>% as.ts(), type = "mu"))
-summary(ur.df(bx_df%>%select(box_cox)%>%as.ts(),type="trend",selectlags = "AIC", lags = 12))
-
+lambda
 
 #Train/Test Split
 #Will split out 2022
-windowl <- 8L
+windowl <- 12L
 train_df <- head(df, round(length(df) - windowl))
 test_df <- tail(df, windowl)
 test_df.ts <- as_tsibble(test_df)
@@ -87,7 +93,7 @@ train_df.ts <- as_tsibble(train_df)
     `Seasonal Naive` = SNAIVE(value ~ lag("year"))
   )
  # Produce forecasts for the trading days in January 2016
-df_fc <- fit_df %>% forecast(h=8)
+df_fc <- fit_df %>% forecast(h=12)
 
 df_fc %>%
   autoplot(df, level = NULL) +
@@ -100,21 +106,31 @@ df_fc %>%
 
 
 #Determingin differencing for ARIMA
-bx_df %>%
+difft <- bx_df %>%
   transmute(
     `Observations` = value,
     `Box-Cox Observations` = box_cox,
     `Seasonally Diffed Box-Cox` = difference(box_cox, 12)
-    ) %>%
+  ) %>%
   pivot_longer(-index, names_to="Type", values_to="Sales") %>%
   mutate(
     Type = factor(Type, levels = c(
       "Observations",
       "Box-Cox Observations",
       "Seasonally Diffed Box-Cox"))
-    ) %>%
+  )
+
+difft %>%
   ggplot(aes(x = index, y = Sales)) +
   geom_line() +
   facet_grid(vars(Type), scales = "free_y") +
   labs(title = "Stationarity in IAS Data", y = NULL)
-  
+
+#KPSS and ADF for testing diffs on the BCed data
+
+Seasonal_diff <- na.omit(difft) %>% filter(Type == "Seasonally Diffed Box-Cox")
+
+summary(ur.kpss(Seasonal_diff %>% select(Sales) %>% as.ts(), type = "mu"))
+summary(ur.df(Seasonal_diff %>% select(Sales) %>% as.ts(), type="none", selectlags = "AIC", lags = 12))
+
+
