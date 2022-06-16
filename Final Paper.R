@@ -36,10 +36,12 @@ auto <- autoplot(df)+
 auto
 
 #acf of the data
-acfplot <- ggAcf(df, 24)+ ggtitle("ACF of Data")
-pacfplot <- ggPacf(df, 24)+ ggtitle("PACF of Data")
+acfplot <- ggAcf(bx_df$box_cox, 36)+ ggtitle("ACF of Data")
+pacfplot <- ggPacf(bx_df$box_cox, 36)+ ggtitle("PACF of Data")
 acfplot
 pacfplot
+
+df %>% features(value, ljung_box, lag = 24, dof = 0)
 
 #seasonal plot of data
 df %>%
@@ -63,6 +65,7 @@ bx_df %>%
 lambda <- df %>%
   features(value, features = guerrero) %>%
   pull(lambda_guerrero)
+lambda
 
 #Box-Cox data
 df %>%
@@ -77,39 +80,40 @@ lambda
 #Train/Test Split
 #Will split out 2022
 windowl <- 12L
-train_df <- head(df, round(length(df) - windowl))
+train_df <- head(df, 77)
 test_df <- tail(df, windowl)
 test_df.ts <- as_tsibble(test_df)
 train_df.ts <- as_tsibble(train_df)
 
 #Benchmarking Methods
+test_df
+print(train_df, n=781)
 
 # Fit the models
  fit_df<- train_df.ts %>%
   model(
     Mean = MEAN(value),
-    `Naïve` = NAIVE(value),
+    `Naive` = NAIVE(value),
     Drift = NAIVE(value ~ drift()),
     `Seasonal Naive` = SNAIVE(value ~ lag("year")))
  
  # Produce forecast
 df_fc <- fit_df %>% forecast(h=12)
 
+df_filter <- df %>% filter_index( "2019 Jan" ~. )
+
 df_fc %>%
-  autoplot(df, level = NULL) +
+  autoplot(df_filter, level = NULL) +
   labs(
     y = "IAS Observations",
     title = "Baseline Forecasts for IAS Bird Observations"
   ) +
   guides(colour = guide_legend(title = "Forecast"))
 
+accuracy(df_fc, df, D = 1)
+
 #ETS
 
-windowl <- 12L
-train_df <- head(bx_df, round(length(bx_df) - windowl))
-test_df <- tail(bx_df, windowl)
-test_df.ts <- as_tsibble(test_df)
-train_df.ts <- as_tsibble(train_df)
 
 goose.train <- bx_df %>%
   filter_index("2015 Jan" ~ "2021 May")
@@ -131,28 +135,28 @@ dcmp %>%
   autoplot(season_adjust)
 
 
-stlAAA <- decomposition_model(
+stlAnA <- decomposition_model(
   STL(box_cox),
-  ETS(season_adjust ~ error("A") + trend("Ad") + season("A")))
+  ETS(season_adjust ~ error("A") + trend("N") + season("A")))
 
-stlAAM <- decomposition_model(
+stlANM <- decomposition_model(
   STL(box_cox),
-  ETS(season_adjust ~ error("A") + trend("Ad") + season("M")))
+  ETS(season_adjust ~ error("A") + trend("N") + season("M")))
 
-AAA <- ETS(box_cox ~ error("A") + trend("Ad") + season("A"))
-AAM <- ETS(box_cox ~ error("A") + trend("Ad") + season("M"))
+ANA <- ETS(box_cox ~ error("A") + trend("N") + season("A"))
+ANM <- ETS(box_cox ~ error("A") + trend("N") + season("M"))
 MNN <- ETS(box_cox ~ error("M") + trend("N") + season("N"))
 
 fit <- goose.train %>%
   model(
-    stlAAA = stlAAA,
-    stlAAM = stlAAM,
-    AAA = AAA,
-    AAM = AAM,
+    stlANA = stlANA,
+    stlANM = stlANM,
+    ANA = ANA,
+    ANM = ANM,
     MNN = MNN
   )
 
-fit %>% forecast(h=12) %>% accuracy(bx_df)
+fit %>% forecast(h=12) %>% accuracy(bx_df, D=1)
 
 #selected the decomposed AAM model
 
@@ -167,7 +171,7 @@ prediction.t <- ts(InvBoxCox(forecast$.mean,lambda), start = c(2021,6), end = c(
 
 df_1 <- as.ts(df)
 
-ts.plot(df_1, prediction, gpars = list(col = c("blue", "orange")))
+ts.plot(df_1, prediction.t, gpars = list(col = c("blue", "orange")))
 
 best <- final_fit
 augment(best) %>% gg_tsdisplay(.resid, lag_max = 24, plot_type = "histogram")
@@ -177,50 +181,61 @@ augment(best) %>%
 
 #determining differencing for arima
 new <- bx_df$box_cox
+
+unitroot_ndiffs(bx_df$value, alpha = 0.05, unitroot_fn = ~unitroot_kpss(.)["kpss_pvalue"], differences = 0:2, .period = 12)
+
 seasonal_diffed <- diff(new,12)
 seasonal_diffed.ts <- as_tsibble(ts(seasonal_diffed, start = c(2016,1), end = c(2022,5), frequency = 12))
-double_diffed <- diff(seasonal_diffed,1)
-double_diffed.ts <- as_tsibble(ts(double_diffed, start = c(2016,1), end = c(2022,5), frequency = 12))
 
-seasonal_diffed.ts
-
-
-bx <- autoplot(bx_df, .vars=box_cox, axis.text.x = FALSE)+ labs(title = "Box-Coxed")
+bx <- autoplot(bx_df, .vars=box_cox)+ labs(title = "Box-Coxed")
 sd <- autoplot(seasonal_diffed.ts)+
   labs(title = "Seasonal Differenced")
 dd <- autoplot(double_diffed.ts)+
   labs(title = "Double Differenced")
-grid.arrange(auto, bx, sd, dd, ncol=1, nrow =4)
+grid.arrange(auto, bx, sd, ncol=1, nrow =3)
+
+autoplot(seasonal_diffed.ts)+ labs(title = "Seasonally DIfferenced Data")
+autoplot(double_diffed.ts)
 
 #seasonal diffed data tests
-summary(ur.kpss(seasonal_diffed.ts %>% as.ts(), type = "mu"))
-summary(ur.df(seasonal_diffed.ts %>% as.ts(), type="none", selectlags = "AIC", lags = 12))
+summary(ur.kpss(seasonal_diffed.ts %>% as.ts(), type = "mu", use.lag = 4))
+summary(ur.df(seasonal_diffed.ts %>% as.ts(), type="none", selectlags = "AIC"))
 
 
-#Double DIffed Data tests
-summary(ur.kpss(double_diffed.ts %>% as.ts(), type = "mu"))
-summary(ur.df(double_diffed.ts %>% as.ts(), type="none", selectlags = "AIC", lags = 12))
-
+acfplot <- ggAcf(seasonal_diffed.ts, 24)+ ggtitle("ACF of Seasonally Differenced Data")
+pacfplot <- ggPacf(seasonal_diffed.ts, 24)+ ggtitle("PACF of Seasonally Differenced Data")
+acfplot
+pacfplot
 
 auto.fit<- train_df.ts %>% model(ARIMA(value, ic = "aic", stepwise = FALSE, approx = FALSE))
 auto.fit
 gg_tsresiduals(auto.fit) + ggtitle("Automatic ARIMA residuals plot")
 
-#'*We believe that the auto ARIMA using AIC is improperly fitting a model because the d of non-*
-#'*seasonal component is returning 2 but when we ran the ndiffs and KPSS we found that 1 dif was the most*
-#'*appropriate for our data set.We allso ran an additional diff and found that our data was overdifferentiated*
-#'*Our residual plot shows that the data does not have a zero mean. The plot has spikes*
-#'*up to 4,000. The acf has 2 significant spikes, and the distribution is not normal.*
-#'*The tails are uneven and the shape is too tall. According to the residuals the model can be improved.*
 
-fit<- train_emp.ts %>% model(auto123101 = ARIMA(value, ic = "aic", stepwise = FALSE, approx = FALSE), 
+fit<- train_df.ts %>% model(auto = ARIMA(value, ic = "aic", stepwise = FALSE, approx = FALSE), 
                              
-                             arima211001 = ARIMA(value ~ 0 + pdq(2,1,1) + PDQ(0,0,1)),
+                             arima1 = ARIMA(value ~ 0 + pdq(1,0,1) + PDQ(0,1,1)),
                              
-                             arima212012 = ARIMA(value ~ 0 + pdq(2,1,2) + PDQ(0,1,2)),
+                             arima2 = ARIMA(value ~ 0 + pdq(1,0,1) + PDQ(0,1,0)),
                              
-                             arima211202 = ARIMA(value ~ 0 + pdq(2,1,1) + PDQ(2,0,2)))
+                             arima3 = ARIMA(value ~ 0 + pdq(1,0,1) + PDQ(1,1,0)),
+                            
+                            arima6 = ARIMA(value ~ 0 + pdq(1,0,1) + PDQ(1,1,1)))
 
 fit %>% pivot_longer(everything(), names_to = "Model Name", values_to = "Orders")
 
 glance(fit) %>% arrange(AICc) %>% select(.model:BIC)
+fit %>% select(arima1) %>% gg_tsresiduals(lag=24)
+
+
+auto_fc <- forecast(fit, h=12) %>% filter(.model=='arima1')
+auto_fc_plot <- auto_fc %>% autoplot(df) +ggtitle("Plot of the (1,0,1)(0,1,1) ARIMA's forecast")
+auto_fc_plot
+manual_fc <- forecast(fit, h=144) %>% filter(.model=='arima212012')
+manual_fc_plot <- manual_fc %>% autoplot(train_emp.ts) +ggtitle("Plot of the selected model's forecast")
+
+grid.arrange(manual_fc_plot, auto_fc_plot)
+auto_fc
+invarima <- InvBoxCox(auto_fc$.mean, lambda)
+accuracy(auto_fc, bx_df)
+accuracy(manual_fc, test_emp.ts)
